@@ -29,7 +29,7 @@ import static NetworkPackage.User.*;
 import static FileDisplayPackage.FileDisplayMainPanel.*;
 import static FileDisplayPackage.FileDisplayTopBar.*;
 
-public class FileDisplayBottomBar {//图片预览底部栏
+public class FileDisplayBottomBar {//文件展示底部栏
     public static final JPanel bottomBarPanel = new JPanel();//底部面板：用于放置按钮等组件
     public static final JButton undoButton = new JButton();//撤销按钮
     public static final JButton redoButton = new JButton();//恢复按钮
@@ -258,7 +258,7 @@ public class FileDisplayBottomBar {//图片预览底部栏
 
         zoomSlider.addChangeListener(_ -> {//为缩放调整拖动条添加变化监听
             if (zoomSlider.hasFocus()) {//如果有焦点
-                imageWidth = zoomSlider.getValue();//设置图片大小为拖动条的值
+                thumbnailItemWidth = zoomSlider.getValue();//设置图片大小为拖动条的值
                 SelectionMouseAdapter.applyZoom();//应用缩放
             }
         });
@@ -578,7 +578,7 @@ public class FileDisplayBottomBar {//图片预览底部栏
             }
         }
         new Timer(100, e -> {//在100ms时延后进行
-            FileDisplayMainPanel.updateMainPanel(false);//更新面板
+            FileDisplayMainPanel.updateFileDisplayMainPanel(false);//更新面板
             fileManipulationButtonEnableJudgement(0);//文件操作按钮状态判断
             historyManipulationButtonEnableJudgement();//历史操作按钮状态判断
             ((Timer) e.getSource()).stop();//停止计时器
@@ -591,7 +591,7 @@ public class FileDisplayBottomBar {//图片预览底部栏
             itemHoverTipWindow.dispose();//释放提示信息
             itemHoverTipWindow = null;//提示信息置空
         }
-        Main.pictureManagementSystemFrame.setVisible(false);//不可见
+        Main.diskManagementSystemFrame.setVisible(false);//不可见
         Main.slideFrame.setVisible(true);//可见
         if (Main.SettingState.windowState) {//如果全屏
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(Main.slideFrame);//设置窗口全屏

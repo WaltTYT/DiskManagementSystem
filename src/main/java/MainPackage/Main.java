@@ -34,24 +34,23 @@ import static FileEditPackage.FileEditToolBar.toolBarPanel;
 import static MainPackage.Setting.handleErrorLog;
 import static MainPackage.ThemeColor.*;
 
-public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 加载FAT 以该文件夹为根目录加载目录树 显示图形化界面
+public class Main {//主类 TODO 加载FAT 双击节点行为
     public static DirectoryTree directoryTree;//目录树类
-    public static FileDisplayTopBar picturePreviewTopBar;//图片预览顶部栏类
-    public static FileDisplayMainPanel picturePreviewMainPanel;//图片预览主面板类
-    public static FileDisplayBottomBar picturePreviewBottomBar;//图片预览底部栏类
-    public static FileDisplayPopupMenu picturePreviewPopupMenu;//图片预览右键弹出菜单类
-    public static FileEditPanel slidePicturePanel;//幻灯片图片面板类
-    public static FileEditScrollPane slideScrollPane;//幻灯片滚动栏类
-    public static FileEditToolBar slideToolBar;//幻灯片工具栏类
+    public static FileDisplayTopBar fileDisplayTopBar;//文件展示顶部栏类
+    public static FileDisplayMainPanel fileDisplayMainPanel;//文件展示主面板类
+    public static FileDisplayBottomBar fileDisplayBottomBar;//文件展示底部栏类
+    public static FileDisplayPopupMenu fileDisplayPopupMenu;//文件展示右键弹出菜单类
+    public static FileEditPanel fileEditPanel;//幻灯片图片面板类
+    public static FileEditScrollPane fileEditScrollPane;//幻灯片滚动栏类
+    public static FileEditToolBar fileEditToolBar;//幻灯片工具栏类
 
     public static JScrollPane directoryTreeScrollPane;//目录树滚动条
-    public static JPanel picturePreviewTopBarPanel;//图片预览顶部栏面板
-    public static JScrollPane picturePreviewMainPanelScrollPane;//图片预览主面板滚动条
-    public static JPanel picturePreviewBottomBarPanel;//图片预览底部栏面板
-    public static JPanel picturePreviewPanel;//图片预览面板
+    public static JPanel fileDisplayTopBarPanel;//文件展示顶部栏面板
+    public static JScrollPane fileDisplayMainPanelScrollPane;//文件展示主面板滚动条
+    public static JPanel fileDisplayBottomBarPanel;//文件展示底部栏面板
+    public static JPanel fileDisplayPanel;//文件展示面板
     public static JSplitPane panelSplitPane;//面板分割
-    public static BackgroundImagePanel backgroundImagePanel;//自定义背景面板
-    public static JFrame pictureManagementSystemFrame;//图片管理系统窗口
+    public static JFrame diskManagementSystemFrame;//磁盘管理系统窗口
     public static JFrame slideFrame;//幻灯片窗口
 
     public static final JPanel bottomTipInformationPanel = new JPanel();//底部提示信息面板
@@ -74,11 +73,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
         public static boolean pictureSuffix;//图片后缀
         public static boolean renameStrategy;//命名策略
         public static boolean searchStrategy;//搜索策略
-        public static boolean GPUAcceleration;//GPU加速
-        public static int customGIFFrameAmount;//自定义GIF帧数量
-        public static boolean GIFStrategy;//GIF策略
-        public static int customCacheRemainAmount;//自定义缓存保留数量
-        public static boolean cacheStrategy;//缓存策略
         public static int customRecycleCleanTime;//自定义回收清理时间
         public static boolean recycleStrategy;//回收策略
         public static int masterVolume;//总体音量
@@ -121,16 +115,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 SettingState.settingStateHashMap.put("pictureSuffix", "false");
                 SettingState.settingStateHashMap.put("renameStrategy", "false");
                 SettingState.settingStateHashMap.put("searchStrategy", "false");
-                SettingState.settingStateHashMap.put("GPUAcceleration", "false");
-                SettingState.settingStateHashMap.put("customGIFFrameAmount", "5");
-                SettingState.settingStateHashMap.put("GIFStrategy", "false");
-                SettingState.settingStateHashMap.put("customCacheRemainAmount", "500");
-                SettingState.settingStateHashMap.put("cacheStrategy", "false");
-                SettingState.settingStateHashMap.put("customRecycleCleanTime", "30");
-                SettingState.settingStateHashMap.put("recycleStrategy", "false");
-                SettingState.settingStateHashMap.put("pictureDirectory", "");//默认路径为空
-                SettingState.settingStateHashMap.put("backgroundPictureDirectory", "");//默认路径为空
-                SettingState.settingStateHashMap.put("imageOpacity", "50");
                 SettingState.settingStateHashMap.put("masterVolume", "88");
                 SettingState.settingStateHashMap.put("masterState", "false");
                 SettingState.settingStateHashMap.put("bgmVolume", "0");
@@ -158,11 +142,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 SettingState.pictureSuffix = false;
                 SettingState.renameStrategy = false;
                 SettingState.searchStrategy = false;
-                SettingState.GPUAcceleration = false;
-                SettingState.customGIFFrameAmount = 5;
-                SettingState.GIFStrategy = false;
-                SettingState.customCacheRemainAmount = 500;
-                SettingState.cacheStrategy = false;
                 SettingState.customRecycleCleanTime = 30;
                 SettingState.recycleStrategy = false;
                 SettingState.masterVolume = 88;
@@ -191,11 +170,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 SettingState.pictureSuffix = json.getBoolean("pictureSuffix");
                 SettingState.renameStrategy = json.getBoolean("renameStrategy");
                 SettingState.searchStrategy = json.getBoolean("searchStrategy");
-                SettingState.GPUAcceleration = json.getBoolean("GPUAcceleration");
-                SettingState.customGIFFrameAmount = json.getInt("customGIFFrameAmount");
-                SettingState.GIFStrategy = json.getBoolean("GIFStrategy");
-                SettingState.customCacheRemainAmount = json.getInt("customCacheRemainAmount");
-                SettingState.cacheStrategy = json.getBoolean("cacheStrategy");
                 SettingState.customRecycleCleanTime = json.getInt("customRecycleCleanTime");
                 SettingState.recycleStrategy = json.getBoolean("recycleStrategy");
                 SettingState.masterVolume = json.getInt("masterVolume");
@@ -206,22 +180,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 SettingState.effectState = json.getBoolean("effectState");
                 SettingState.utilizeTimes = json.getInt("utilizeTimes") + 1;//使用次数+1
                 System.out.println(SettingState.utilizeTimes);
-
-                if (SettingState.GPUAcceleration) {//如果开启GPU加速
-                    System.setProperty("sun.java2d.opengl", "true");//使用openGL加速
-                    System.setProperty("sun.java2d.d3d", "true");//使用Direct3D加速
-                    System.setProperty("sun.java2d.renderer", "sun.java2d.marlin.MarlinRenderingEngine");//使用Marlin渲染器
-                }
-                if (SettingState.GIFStrategy) {//如果完整播放
-                    MAX_GIF_FRAME_AMOUNT = 10000;//设置为无穷
-                } else {//否则
-                    MAX_GIF_FRAME_AMOUNT = SettingState.customGIFFrameAmount;//设置为GIF帧数量
-                }
-                if (SettingState.cacheStrategy) {//如果关闭清理
-                    MAX_CACHE_REMAIN_AMOUNT = 1000000;//设置为无穷
-                } else {//否则
-                    MAX_CACHE_REMAIN_AMOUNT = SettingState.customCacheRemainAmount;//设置为缓存保留数量
-                }
             }
         } catch (Exception e) {
             handleErrorLog(e.getMessage());//处理错误日志
@@ -231,38 +189,38 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
 
     public static void initMain() {//初始化主类
         directoryTree = new DirectoryTree();//创建目录树类，只在main中创建变量，其余时候用类名调用方法（需要全部设为static，防止创建多个类，数据发生丢失）
-        picturePreviewMainPanel = new FileDisplayMainPanel();//创建图片预览主面板
-        picturePreviewTopBar = new FileDisplayTopBar();//创建图片预览顶部栏
-        picturePreviewBottomBar = new FileDisplayBottomBar();//创建图片预览底部栏
-        picturePreviewPopupMenu = new FileDisplayPopupMenu();//创建图片预览右键弹出菜单
-        slidePicturePanel = new FileEditPanel();//创建幻灯片图片面板
-        slideScrollPane = new FileEditScrollPane();//创建幻灯片滚动栏
-        slideToolBar = new FileEditToolBar();//创建幻灯片工具栏
+        fileDisplayMainPanel = new FileDisplayMainPanel();//创建图片预览主面板
+        fileDisplayTopBar = new FileDisplayTopBar();//创建图片预览顶部栏
+        fileDisplayBottomBar = new FileDisplayBottomBar();//创建图片预览底部栏
+        fileDisplayPopupMenu = new FileDisplayPopupMenu();//创建图片预览右键弹出菜单
+        fileEditPanel = new FileEditPanel();//创建幻灯片图片面板
+        fileEditScrollPane = new FileEditScrollPane();//创建幻灯片滚动栏
+        fileEditToolBar = new FileEditToolBar();//创建幻灯片工具栏
 
         directoryTreeScrollPane = new JScrollPane(DirectoryTree.directoryTree);//为目录树面板添加滚动条
-        picturePreviewTopBarPanel = topBarPanel;//获取顶部栏面板（固定高度）
-        picturePreviewMainPanelScrollPane = new JScrollPane(fileDisplayMainPanel) {//创建主面板滚动栏
+        fileDisplayTopBarPanel = topBarPanel;//获取顶部栏面板（固定高度）
+        fileDisplayMainPanelScrollPane = new JScrollPane(mainPanel) {//创建主面板滚动栏
             @Override
             protected void paintComponent(Graphics g) {//重写绘制方法
                 super.paintComponent(g);//调用父类方法绘制清除背景
                 setForeground(Color.blue);//设置前景色
             }
         };
-        picturePreviewBottomBarPanel = bottomBarPanel;//获取底部栏面板（固定高度）
-        picturePreviewPanel = new JPanel(new BorderLayout());//创建图片预览面板，使用BorderLayout布局管理器
-        panelSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, directoryTreeScrollPane, picturePreviewPanel);//创建目录树滚动条和图片预览面板之间的分割
-        pictureManagementSystemFrame = new JFrame(SettingState.systemLanguage ? "Spike Vision Cloud" : "穗民云镜");//创建图片管理系统窗口
+        fileDisplayBottomBarPanel = bottomBarPanel;//获取底部栏面板（固定高度）
+        fileDisplayPanel = new JPanel(new BorderLayout());//创建图片预览面板，使用BorderLayout布局管理器
+        panelSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, directoryTreeScrollPane, fileDisplayPanel);//创建目录树滚动条和图片预览面板之间的分割
+        diskManagementSystemFrame = new JFrame(SettingState.systemLanguage ? "Disk Management System" : "磁盘管理系统");//创建磁盘管理系统窗口
         slideFrame = new JFrame();//创建幻灯片窗口
 
         directoryTreeScrollPane.getVerticalScrollBar().setUnitIncrement(25);//设置垂直滚动条滚动长度
         directoryTreeScrollPane.getHorizontalScrollBar().setUnitIncrement(5);//设置水平滚动条滚动长度
 
-        picturePreviewMainPanelScrollPane.getVerticalScrollBar().setUnitIncrement(70);//设置主面板垂直滚动条单词滚动长度
-        picturePreviewMainPanelScrollPane.getHorizontalScrollBar().setUnitIncrement(20);//设置主面板水平滚动条单词滚动长度
+        fileDisplayMainPanelScrollPane.getVerticalScrollBar().setUnitIncrement(70);//设置主面板垂直滚动条单词滚动长度
+        fileDisplayMainPanelScrollPane.getHorizontalScrollBar().setUnitIncrement(20);//设置主面板水平滚动条单词滚动长度
 
-        picturePreviewPanel.add(picturePreviewTopBarPanel, BorderLayout.NORTH);//顶部栏位于北部
-        picturePreviewPanel.add(picturePreviewMainPanelScrollPane, BorderLayout.CENTER);//主面板位于中部
-        picturePreviewPanel.add(picturePreviewBottomBarPanel, BorderLayout.SOUTH);//底部栏位于南部
+        fileDisplayPanel.add(fileDisplayTopBarPanel, BorderLayout.NORTH);//顶部栏位于北部
+        fileDisplayPanel.add(fileDisplayMainPanelScrollPane, BorderLayout.CENTER);//主面板位于中部
+        fileDisplayPanel.add(fileDisplayBottomBarPanel, BorderLayout.SOUTH);//底部栏位于南部
 
         panelSplitPane.setDividerSize(5);//设置分割条厚度
         panelSplitPane.setContinuousLayout(true);//设置分割条可连续分割
@@ -281,40 +239,37 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
         directoryTreeScrollPane.setOpaque(true);//设置不透明
         directoryTreeScrollPane.getViewport().setBackground(SettingState.themeColor ? DARK_DIRECTORY_MAIN_COLOR : LIGHT_DIRECTORY_MAIN_COLOR);//设置背景
         directoryTreeScrollPane.getViewport().setOpaque(true);//设置不透明
-        picturePreviewBottomBarPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景
-        picturePreviewBottomBarPanel.setOpaque(true);//设置不透明
-        picturePreviewMainPanelScrollPane.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
-        picturePreviewMainPanelScrollPane.setOpaque(true);//设置不透明
-        picturePreviewMainPanelScrollPane.getViewport().setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
-        picturePreviewMainPanelScrollPane.getViewport().setOpaque(true);//设置不透明
-        picturePreviewTopBarPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景
-        picturePreviewTopBarPanel.setOpaque(true);//设置不透明
-        picturePreviewPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
-        picturePreviewPanel.setOpaque(true);//设置不透明
+        fileDisplayBottomBarPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景
+        fileDisplayBottomBarPanel.setOpaque(true);//设置不透明
+        fileDisplayMainPanelScrollPane.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
+        fileDisplayMainPanelScrollPane.setOpaque(true);//设置不透明
+        fileDisplayMainPanelScrollPane.getViewport().setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
+        fileDisplayMainPanelScrollPane.getViewport().setOpaque(true);//设置不透明
+        fileDisplayTopBarPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景
+        fileDisplayTopBarPanel.setOpaque(true);//设置不透明
+        fileDisplayPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
+        fileDisplayPanel.setOpaque(true);//设置不透明
         panelSplitPane.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
         panelSplitPane.setOpaque(true);//设置不透明
-        backgroundImagePanel = new BackgroundImagePanel(null, 0);//不设置背景图片
 
-        backgroundImagePanel.setLayout(new BorderLayout());//设置布局
-        backgroundImagePanel.add(panelSplitPane);//将分割条放入面板中
-        backgroundImagePanel.add(bottomTipInformationPanel, BorderLayout.SOUTH);//把提示信息放到面板南部
-        pictureManagementSystemFrame.setContentPane(backgroundImagePanel);//设置内容面板为背景图片面板
-        pictureManagementSystemFrame.setSize(screenSize.width, screenSize.height);//设置窗口大小为当前电脑分辨率
-        pictureManagementSystemFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//设置窗口关闭行为
-        pictureManagementSystemFrame.setAutoRequestFocus(true);//自动请求焦点
+        diskManagementSystemFrame.add(panelSplitPane);//将分割条放入面板中
+        diskManagementSystemFrame.add(bottomTipInformationPanel, BorderLayout.SOUTH);//把提示信息放到面板南部
+        diskManagementSystemFrame.setSize(screenSize.width, screenSize.height);//设置窗口大小为当前电脑分辨率
+        diskManagementSystemFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);//设置窗口关闭行为
+        diskManagementSystemFrame.setAutoRequestFocus(true);//自动请求焦点
         try {
-            pictureManagementSystemFrame.setIconImage(ImageIO.read(new File("src/material/image/pictureManagementSystem.png")));//设置窗口图标
+            diskManagementSystemFrame.setIconImage(ImageIO.read(new File("src/material/image/pictureManagementSystem.png")));//设置窗口图标
         } catch (IOException e) {
             handleErrorLog(e.getMessage());//处理错误日志
             throw new RuntimeException(e);//捕获异常
         }
         if (SettingState.windowState) {//如果全屏
-            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(pictureManagementSystemFrame);//设置窗口全屏
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(diskManagementSystemFrame);//设置窗口全屏
         } else {//否则
-            pictureManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
+            diskManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
         }
-        pictureManagementSystemFrame.setVisible(true);//设置窗口可见
-        JRootPane pictureManagementSystemFrameRoot = pictureManagementSystemFrame.getRootPane();//获取窗口的根
+        diskManagementSystemFrame.setVisible(true);//设置窗口可见
+        JRootPane pictureManagementSystemFrameRoot = diskManagementSystemFrame.getRootPane();//获取窗口的根
         pictureManagementSystemFrameRoot.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeFullscreen");//为根设置关闭窗口全屏ESC按键绑定
         pictureManagementSystemFrameRoot.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), "toggleFullscreen");//为根设置切换窗口全屏F11按键绑定
         pictureManagementSystemFrameRoot.getActionMap().put("closeFullscreen", new AbstractAction() {//当ESC执行时
@@ -327,7 +282,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                     refreshMainPanel();//刷新
                 } else if (SettingState.windowState) {//如果全屏
                     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);//取消窗口全屏
-                    pictureManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
+                    diskManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
                     SettingState.windowState = false;//更新
                     Setting.displayTitleRadioButton.setSelected(true);//选中
                     Setting.settingDialog.setAlwaysOnTop(false);//设置不永远在最上层
@@ -346,7 +301,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
             public void actionPerformed(ActionEvent event) {//行为执行
                 if (SettingState.windowState) {//如果全屏
                     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);//取消窗口全屏
-                    pictureManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
+                    diskManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
                     SettingState.windowState = false;//更新
                     Setting.displayTitleRadioButton.setSelected(true);//选中
                     Setting.settingDialog.setAlwaysOnTop(false);//设置不永远在最上层
@@ -359,7 +314,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                     }
                     picturePanel.setPreferredSize(new Dimension(Main.screenSize.width, PANEL_DEFAULT_HEIGHT));//设置大小
                 } else {//否则
-                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(pictureManagementSystemFrame);//设置窗口全屏
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(diskManagementSystemFrame);//设置窗口全屏
                     SettingState.windowState = true;//更新
                     createBottomTipWindow(SettingState.systemLanguage ? "Press ESC Or F11 To Exit Fullscreen" : "按下 ESC 或 F11 即可退出全屏");//提示
                     Setting.hideTitleRadioButton.setSelected(true);//选中
@@ -375,7 +330,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 }
             }
         });
-        pictureManagementSystemFrame.addWindowFocusListener(new WindowFocusListener() {//如果发生窗口聚焦事件
+        diskManagementSystemFrame.addWindowFocusListener(new WindowFocusListener() {//如果发生窗口聚焦事件
             @Override
             public void windowGainedFocus(WindowEvent e) {//如果窗口获得聚焦
                 if (Setting.tutorialStep != 0) {//如果有教程
@@ -400,13 +355,13 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                     if (!loading) {//如果不在加载中
                         if (currentFolder != null) {//如果当前文件夹不为空
                             if (!Objects.equals(currentFolder, SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果不是云盘结点
-                                File[] currentPictureFileList = pictureFileListSortProcess(detectPictureFile(new File(currentFolder).listFiles()));//获取当前图片文件列表
+                                File[] currentPictureFileList = fileListSortProcess(detectFile(new File(currentFolder).listFiles()));//获取当前图片文件列表
                                 boolean flag = false;//是否刷新判断
-                                if (currentPictureFileList.length != pictureFileList.length) {//如果长度不一致
+                                if (currentPictureFileList.length != FileDisplayMainPanel.currentFileList.length) {//如果长度不一致
                                     flag = true;//需要刷新
                                 } else {//否则
                                     for (int i = 0; i < currentPictureFileList.length; i++) {//遍历目录树图片文件列表
-                                        if (!currentPictureFileList[i].getAbsolutePath().equals(pictureFileList[i].getAbsolutePath())) {//如果文件发生变化
+                                        if (!currentPictureFileList[i].getAbsolutePath().equals(FileDisplayMainPanel.currentFileList[i].getAbsolutePath())) {//如果文件发生变化
                                             flag = true;//需要刷新
                                             break;//直接退出
                                         }
@@ -414,7 +369,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                                 }
                                 if (flag) {//如果需要刷新
                                     DirectoryTree.updateCurrentFileList(currentPictureFileList);//更新文件夹
-                                    updateMainPanel(false);//通知更新
+                                    updateFileDisplayMainPanel(false);//通知更新
                                     fileManipulationButtonEnableJudgement(getSelectionThumbnailItemList().size());//文件操作按钮判断
                                     directoryManipulationButtonEnableJudgement();//目录操作按钮判断
                                     FileDisplayBottomBar.historyManipulationButtonEnableJudgement();//历史操作按钮判断
@@ -438,7 +393,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 }
             }
         });
-        pictureManagementSystemFrame.addWindowListener(new WindowAdapter() {//如果发生窗口事件
+        diskManagementSystemFrame.addWindowListener(new WindowAdapter() {//如果发生窗口事件
             @Override
             public void windowClosing(WindowEvent e) {//如果窗口正在关闭
                 try {
@@ -457,11 +412,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                     SettingState.settingStateHashMap.put("pictureSuffix", String.valueOf(SettingState.pictureSuffix));
                     SettingState.settingStateHashMap.put("renameStrategy", String.valueOf(SettingState.renameStrategy));
                     SettingState.settingStateHashMap.put("searchStrategy", String.valueOf(SettingState.searchStrategy));
-                    SettingState.settingStateHashMap.put("GPUAcceleration", String.valueOf(SettingState.GPUAcceleration));
-                    SettingState.settingStateHashMap.put("customGIFFrameAmount", String.valueOf(SettingState.customGIFFrameAmount));
-                    SettingState.settingStateHashMap.put("GIFStrategy", String.valueOf(SettingState.GIFStrategy));
-                    SettingState.settingStateHashMap.put("customCacheRemainAmount", String.valueOf(SettingState.customCacheRemainAmount));
-                    SettingState.settingStateHashMap.put("cacheStrategy", String.valueOf(SettingState.cacheStrategy));
                     SettingState.settingStateHashMap.put("customRecycleCleanTime", String.valueOf(SettingState.customRecycleCleanTime));
                     SettingState.settingStateHashMap.put("recycleStrategy", String.valueOf(SettingState.recycleStrategy));
                     SettingState.settingStateHashMap.put("masterVolume", String.valueOf(SettingState.masterVolume));
@@ -487,7 +437,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                     } catch (Exception ex) {
                         handleErrorLog(ex.getMessage());//处理错误日志
                         ex.printStackTrace();//捕获异常
-                        JOptionPane.showMessageDialog(pictureManagementSystemFrame, SettingState.systemLanguage ? "Failure Save Configuration" : "保存配置失败", SettingState.systemLanguage ? "Error" : "错误", JOptionPane.ERROR_MESSAGE);//提示用户保存失败
+                        JOptionPane.showMessageDialog(diskManagementSystemFrame, SettingState.systemLanguage ? "Failure Save Configuration" : "保存配置失败", SettingState.systemLanguage ? "Error" : "错误", JOptionPane.ERROR_MESSAGE);//提示用户保存失败
                     }
 
                     File[] recycleFileList = new File(spikeVisionCloudPath + "/.appRecycleBin").listFiles();//获取所有回收文件
@@ -560,11 +510,11 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 if (FileEditScrollPane.itemHoverTipWindow != null && FileEditScrollPane.itemHoverTipWindow.isVisible()) {//如果悬浮提示信息不为空
                     FileEditScrollPane.itemHoverTipWindow.dispose();//释放悬浮提示信息
                 }
-                pictureManagementSystemFrame.setVisible(true);//图片管理系统窗口可见
+                diskManagementSystemFrame.setVisible(true);//图片管理系统窗口可见
                 if (SettingState.windowState) {//如果全屏
-                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(pictureManagementSystemFrame);//设置窗口全屏
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(diskManagementSystemFrame);//设置窗口全屏
                 } else {//否则
-                    pictureManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
+                    diskManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
                 }
                 slideCache.clear();//清空缓存
             }
@@ -591,8 +541,8 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
 
         directoryTreeScrollPane.getVerticalScrollBar().setUI(new CustomScrollPane());//设置滚动条UI
         directoryTreeScrollPane.getHorizontalScrollBar().setUI(new CustomScrollPane());//设置滚动条UI
-        picturePreviewMainPanelScrollPane.getVerticalScrollBar().setUI(new CustomScrollPane());//设置滚动条UI
-        picturePreviewMainPanelScrollPane.getHorizontalScrollBar().setUI(new CustomScrollPane());//设置滚动条UI
+        fileDisplayMainPanelScrollPane.getVerticalScrollBar().setUI(new CustomScrollPane());//设置滚动条UI
+        fileDisplayMainPanelScrollPane.getHorizontalScrollBar().setUI(new CustomScrollPane());//设置滚动条UI
 
         try {
             Robot robot = new Robot();//创建Robot对象切换输入法
@@ -609,7 +559,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
         }
 
         if (SettingState.utilizeTimes == 1) {//如果用户第一次使用
-            JOptionPane.showMessageDialog(pictureManagementSystemFrame, "感谢您使用该软件，我们将对本软件进行基础的教程介绍\nThank You For Using This Software, We Will Give Basic Tutorial Introduction", "欢迎 Welcome", JOptionPane.INFORMATION_MESSAGE);//展示提示信息
+            JOptionPane.showMessageDialog(diskManagementSystemFrame, "感谢您使用该软件，我们将对本软件进行基础的教程介绍\nThank You For Using This Software, We Will Give Basic Tutorial Introduction", "欢迎 Welcome", JOptionPane.INFORMATION_MESSAGE);//展示提示信息
             Setting.handleUtilizeTutorial();//开启使用教程
         }
     }

@@ -118,7 +118,7 @@ public class FileEditPanel {//幻灯片图片面板类
     public static void updatePicturePanel() {//更新图片面板
         picturePanel.removeAll();//清空图片面板
         FileDisplayMainPanel.ThumbnailItem thumbnailItem = FileDisplayMainPanel.thumbnailItemList.get(pictureIndex);//获取当前缩略图
-        currentSlideItem = createSlideItem(thumbnailItem.getFile(), thumbnailItem.getFormat());//设置当前幻灯片项目为复制后的项目
+        currentSlideItem = createSlideItem(thumbnailItem.getFile());//设置当前幻灯片项目为复制后的项目
         picturePanel.add(currentSlideItem);//当前幻灯片项目添加到图片面板中
         currentSlideItem.add(previousButton);//添加上一张图片按钮
         currentSlideItem.add(nextButton);//添加下一张图片按钮
@@ -150,7 +150,7 @@ public class FileEditPanel {//幻灯片图片面板类
         SwingUtilities.invokeLater(FileEditScrollPane::scrollToVisible);//滚动到可见区域
     }
 
-    private static SlideItem createSlideItem(File file, String format) {//创建幻灯片项目
+    private static SlideItem createSlideItem(File file) {//创建幻灯片项目
         String cacheKey = file.getAbsolutePath();//缓存地址
         SoftReference<BufferedImage> cachedRef = slideCache.get(cacheKey);//优先从缓存获取（使用软引用）
         if (cachedRef != null) {//如果命中缓存
@@ -165,7 +165,7 @@ public class FileEditPanel {//幻灯片图片面板类
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
                 g2d.drawImage(original, 0, 0, scaled.getWidth(), scaled.getHeight(), null);//绘制图像
                 g2d.dispose();//释放
-                return new SlideItem(scaled, file, format, ratio);//返回项目
+                return new SlideItem(scaled, file, ratio);//返回项目
             }
             return null;//返回空
         } else {//否则
@@ -183,7 +183,7 @@ public class FileEditPanel {//幻灯片图片面板类
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
                 g2d.drawImage(original, 0, 0, scaledImage.getWidth(), scaledImage.getHeight(), null);//绘制图像
                 g2d.dispose();//释放
-                return new SlideItem(scaledImage, file, format, ratio);//返回项目
+                return new SlideItem(scaledImage, file, ratio);//返回项目
             } catch (IOException e) {
                 handleErrorLog(e.getMessage());//处理错误日志
                 System.err.println("IOException:" + file.getName());//捕获异常
@@ -235,7 +235,6 @@ public class FileEditPanel {//幻灯片图片面板类
     public static class SlideItem extends JComponent {//幻灯片项目类（继承JComponent）
         private final File file;//文件
         private static BufferedImage fileImage;//文件图像（静态保证数据一致性）
-        private final String format;//图像格式
 
         private boolean isGIF = false;//文件是否是GIF
         private int currentGIFFrame = 0;//当前帧数
@@ -253,31 +252,19 @@ public class FileEditPanel {//幻灯片图片面板类
             return file;
         }
 
-        public String getFormat() {//获取格式
-            return format;
-        }
-
         public boolean isNotGIF() {//获取是否是GIF
             return !isGIF;
         }
 
-        public SlideItem(BufferedImage fileImage, File file, String format, float scale) {//构造方法：幻灯片主面板创建缩略图项目
+        public SlideItem(BufferedImage fileImage, File file, float scale) {//构造方法：幻灯片主面板创建缩略图项目
             this.file = file;
             SlideItem.fileImage = fileImage;
-            this.format = format;
             currentScale = scale;
             initialScale = scale;
             zoomSlider.setValue((int) (currentScale * 100));//设置值
             zoomTextField.setText((int) (currentScale * 100) + "%");//设置文本
             dragOffset.setLocation((Main.screenSize.width - fileImage.getWidth()) / 2, 0);//初始化偏移为居中位置
 
-            if ("GIF".equals(format)) {//如果是GIF
-                this.isGIF = true;//GIF为真
-                loadGIFFrame(file);//加载GIF帧
-                if (!GIFFrames.isEmpty()) {//如果帧为空
-                    startGIFAnimation();//启动GIF动画
-                }
-            }
             setPreferredSize(new Dimension(Main.screenSize.width, fileImage.getHeight()));//设置组件大小（宽度和图片一致，高度为图片高度加上文本高度）
 
             addMouseListener(new MouseAdapter() {//添加鼠标监听

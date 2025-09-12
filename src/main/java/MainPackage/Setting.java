@@ -34,9 +34,9 @@ import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
 import static java.awt.event.InputEvent.SHIFT_DOWN_MASK;
 
 public class Setting {//设置类
-    public static JDialog settingDialog = new JDialog(pictureManagementSystemFrame, SettingState.systemLanguage ? "Setting" : "设置", true);//设置对话窗口
-    public static JDialog insertImageDialog = new JDialog(pictureManagementSystemFrame, SettingState.systemLanguage ? "Insert Image" : "插入图片", true);//插入图片对话窗口
-    public static JDialog suggestionFeedbackDialog = new JDialog(pictureManagementSystemFrame, SettingState.systemLanguage ? "Suggestion and Feedback" : "建议与反馈", true);//建议反馈对话窗口
+    public static JDialog settingDialog = new JDialog(diskManagementSystemFrame, SettingState.systemLanguage ? "Setting" : "设置", true);//设置对话窗口
+    public static JDialog insertImageDialog = new JDialog(diskManagementSystemFrame, SettingState.systemLanguage ? "Insert Image" : "插入图片", true);//插入图片对话窗口
+    public static JDialog suggestionFeedbackDialog = new JDialog(diskManagementSystemFrame, SettingState.systemLanguage ? "Suggestion and Feedback" : "建议与反馈", true);//建议反馈对话窗口
 
     public static JRadioButton closeAudioRadioButton;//关闭音频单选按钮
     public static JRadioButton closeMusicRadioButton;//关闭音乐单选按钮
@@ -134,21 +134,21 @@ public class Setting {//设置类
                         SettingState.systemLanguage ? "The Pictures Would Be Placed Here After Opening Folder" : "文件夹打开后的图片会放在这里",
                         SettingState.systemLanguage ? "The Right Mouse Menu Can Be Opened By Clicking Right Mouse:" : "鼠标右键可以打开右键菜单",
                         SettingState.systemLanguage ? "(Press Any Key To Continue...)" : "（按任意键继续...）"},
-                picturePreviewMainPanelScrollPane.getLocationOnScreen().x - 1, picturePreviewMainPanelScrollPane.getLocationOnScreen().y, picturePreviewMainPanelScrollPane.getWidth() - 1, picturePreviewMainPanelScrollPane.getHeight(), panelSplitPane.getDividerLocation() + 5, screenSize.height / 2 - 45
+                fileDisplayMainPanelScrollPane.getLocationOnScreen().x - 1, fileDisplayMainPanelScrollPane.getLocationOnScreen().y, fileDisplayMainPanelScrollPane.getWidth() - 1, fileDisplayMainPanelScrollPane.getHeight(), panelSplitPane.getDividerLocation() + 5, screenSize.height / 2 - 45
         ));
         tutorialStepRecordList.add(new TutorialStep(
                 new String[]{
                         SettingState.systemLanguage ? "    This Is Thumbnail Picture Top Bar" : "           这是图片缩略图顶部栏",
                         SettingState.systemLanguage ? "You Can Copy,Paste,Rename,Remove And So On" : "你可以对图片进行复制、粘贴、重命名、删除等操作",
                         SettingState.systemLanguage ? "       (Press Any Key To Continue...)" : "           （按任意键继续...）"},
-                picturePreviewTopBarPanel.getLocationOnScreen().x - 1, picturePreviewTopBarPanel.getLocationOnScreen().y, picturePreviewTopBarPanel.getWidth() - 1, picturePreviewTopBarPanel.getHeight(), panelSplitPane.getDividerLocation() + picturePreviewTopBarPanel.getWidth() / 2 - (SettingState.systemLanguage ? 290 : 315), picturePreviewTopBarPanel.getLocationOnScreen().y + picturePreviewTopBarPanel.getHeight() + 30
+                fileDisplayTopBarPanel.getLocationOnScreen().x - 1, fileDisplayTopBarPanel.getLocationOnScreen().y, fileDisplayTopBarPanel.getWidth() - 1, fileDisplayTopBarPanel.getHeight(), panelSplitPane.getDividerLocation() + fileDisplayTopBarPanel.getWidth() / 2 - (SettingState.systemLanguage ? 290 : 315), fileDisplayTopBarPanel.getLocationOnScreen().y + fileDisplayTopBarPanel.getHeight() + 30
         ));
         tutorialStepRecordList.add(new TutorialStep(
                 new String[]{
                         SettingState.systemLanguage ? "                  This Is Thumbnail Picture Bottom Bar" : "                 这是图片缩略图底部栏",
                         SettingState.systemLanguage ? "You Can Undo and Redo,Setting,Open Slide,Change Picture Scaling And So On" : "你可以进行撤销和恢复、设置、打开幻灯片、改变图片缩放等操作",
                         SettingState.systemLanguage ? "                      (Press Any Key To Continue...)" : "                 （按任意键继续...）"},
-                picturePreviewBottomBarPanel.getLocationOnScreen().x - 1, picturePreviewBottomBarPanel.getLocationOnScreen().y, picturePreviewBottomBarPanel.getWidth() - 1, picturePreviewBottomBarPanel.getHeight(), panelSplitPane.getDividerLocation() + picturePreviewBottomBarPanel.getWidth() / 2 - (SettingState.systemLanguage ? 540 : 420), picturePreviewBottomBarPanel.getLocationOnScreen().y - 85
+                fileDisplayBottomBarPanel.getLocationOnScreen().x - 1, fileDisplayBottomBarPanel.getLocationOnScreen().y, fileDisplayBottomBarPanel.getWidth() - 1, fileDisplayBottomBarPanel.getHeight(), panelSplitPane.getDividerLocation() + fileDisplayBottomBarPanel.getWidth() / 2 - (SettingState.systemLanguage ? 540 : 420), fileDisplayBottomBarPanel.getLocationOnScreen().y - 85
         ));
         tutorialStepRecordList.add(new TutorialStep(
                 new String[]{
@@ -158,7 +158,7 @@ public class Setting {//设置类
                 -5, -5, screenSize.width + 5, screenSize.height + 5, screenSize.width / 2 - 150, screenSize.height / 2 - 25
         ));
 
-        tutorialWindow = new JWindow(pictureManagementSystemFrame);//创建教程窗口（设置父窗口为主窗口防止覆盖）
+        tutorialWindow = new JWindow(diskManagementSystemFrame);//创建教程窗口（设置父窗口为主窗口防止覆盖）
         tutorialWindow.setVisible(true);//设置可见
         tutorialWindow.setSize(screenSize);//设置大小
         tutorialWindow.setLocation(0, 0);//设置位置
@@ -202,7 +202,7 @@ public class Setting {//设置类
             tutorialStep = 0;//重置为0
             tutorialWindow.dispose();//释放
             componentFocusable(true);//可聚焦
-            fileDisplayMainPanel.requestFocusInWindow();//请求焦点
+            mainPanel.requestFocusInWindow();//请求焦点
             return;//返回
         }
         tutorialWindow.setContentPane(new TutorialPanel(tutorialStepRecordList.get(stepIndex - 1)));//设置内容面板为通过记录类创建的教程面板
@@ -225,7 +225,7 @@ public class Setting {//设置类
         sortComboBox.setFocusable(focusable);
         searchField.getInputTextField().setFocusable(focusable);
         searchField.getActionButton().setFocusable(focusable);
-        fileDisplayMainPanel.setFocusable(focusable);
+        mainPanel.setFocusable(focusable);
         FileDisplayBottomBar.undoButton.setFocusable(focusable);
         FileDisplayBottomBar.redoButton.setFocusable(focusable);
         FileDisplayBottomBar.slideButton.setFocusable(focusable);
@@ -400,7 +400,7 @@ public class Setting {//设置类
             }
         });
 
-        suggestionFeedbackDialog = new JDialog(pictureManagementSystemFrame, SettingState.systemLanguage ? "Suggestion and Feedback" : "建议与反馈", true);//创建建议反馈对话窗口
+        suggestionFeedbackDialog = new JDialog(diskManagementSystemFrame, SettingState.systemLanguage ? "Suggestion and Feedback" : "建议与反馈", true);//创建建议反馈对话窗口
         suggestionFeedbackDialog.setIconImage(new ImageIcon("src/material/image/suggestion.png").getImage());//设置图标
         suggestionFeedbackDialog.setLayout(new BorderLayout());//设置布局
         suggestionFeedbackDialog.add(suggestionFeedbackTextArea, BorderLayout.NORTH);
@@ -492,7 +492,7 @@ public class Setting {//设置类
 
     public static void switchSystemLanguage() {//切换系统语言
         boolean systemLanguage = SettingState.systemLanguage;//系统语言
-        pictureManagementSystemFrame.setTitle(systemLanguage ? "Picture Management System" : "图片管理系统");//设置标题
+        diskManagementSystemFrame.setTitle(systemLanguage ? "Picture Management System" : "图片管理系统");//设置标题
         rootNode.setUserObject(systemLanguage ? "Device" : "设备");//根结点
         computerNode.setUserObject(systemLanguage ? "My Computer" : "我的电脑");//电脑结点
         cloudNode.setUserObject(systemLanguage ? "My Cloud" : "我的云盘");//云盘结点
@@ -545,7 +545,7 @@ public class Setting {//设置类
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));//创建边框
         contentPanel.setBackground(SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
 
-        if (picturePreviewPopupMenu == null) {//如果为空，说明是初始化阶段
+        if (fileDisplayPopupMenu == null) {//如果为空，说明是初始化阶段
             try {
                 AudioInputStream bgm1AudioInputStream = AudioSystem.getAudioInputStream(new File("src/material/bgm/Tear - Daydream.wav"));//通过音频输入流获取音乐文件
                 bgmClip1 = AudioSystem.getClip();//创建音乐播放器
@@ -774,10 +774,10 @@ public class Setting {//设置类
         closeMusicRadioButton.setFont(new Font("楷体", PLAIN, 20));//设置字体
         if (SettingState.bgmState) {//根据设置状态判断
             closeMusicRadioButton.setSelected(true);
-        } else if (picturePreviewPopupMenu == null) {//如果为空，说明是初始化阶段
+        } else if (fileDisplayPopupMenu == null) {//如果为空，说明是初始化阶段
             switchBGM();//开始播放BGM
         }
-        if (picturePreviewPopupMenu == null) {//如果为空，说明是初始化阶段
+        if (fileDisplayPopupMenu == null) {//如果为空，说明是初始化阶段
             int musicAdjustSliderValue = musicAdjustSlider.getValue();//获取拖动条值
             if (bgm1GainControl != null && bgm2GainControl != null && bgm3GainControl != null && bgm4GainControl != null && bgm5GainControl != null) {//如果音频控制非空
                 if (musicAdjustSliderValue == musicAdjustSlider.getMinimum()) {//如果在最小值
@@ -909,7 +909,7 @@ public class Setting {//设置类
         if (SettingState.effectState) {//根据设置状态判断
             closeEffectRadioButton.setSelected(true);
         }
-        if (picturePreviewPopupMenu == null) {//如果为空，说明是初始化阶段
+        if (fileDisplayPopupMenu == null) {//如果为空，说明是初始化阶段
             int effectAdjustSliderValue = effectAdjustSlider.getValue();//获取拖动条值
             if (removeTipEffectGainControl != null && volumeAdjustEffectGainControl != null && switchPictureEffectGainControl != null) {//如果音频控制非空
                 if (effectAdjustSliderValue == effectAdjustSlider.getMinimum()) {//如果在最小值
@@ -1038,7 +1038,7 @@ public class Setting {//设置类
         windowStateButtonGroup.add(hideTitleRadioButton);//组添加隐藏标题单选按钮
         displayTitleRadioButton.addActionListener(_ -> {//为显示标题单选按钮添加事件监听
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);//取消窗口全屏
-            pictureManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
+            diskManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
             SettingState.windowState = false;//更新
             settingDialog.setAlwaysOnTop(false);//设置不永远在最上层
             progressWindow.setAlwaysOnTop(false);//设置不永远在最上层
@@ -1072,7 +1072,7 @@ public class Setting {//设置类
             }
         });
         hideTitleRadioButton.addActionListener(_ -> {//为隐藏标题单选按钮添加事件监听
-            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(pictureManagementSystemFrame);//设置窗口全屏
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(diskManagementSystemFrame);//设置窗口全屏
             createBottomTipWindow(SettingState.systemLanguage ? "Press ESC Or F11 To Exit Fullscreen" : "按下ESC或F11即可退出全屏");//提示
             SettingState.windowState = true;//更新
             settingDialog.setAlwaysOnTop(true);//设置永远在最上层
@@ -1624,7 +1624,7 @@ public class Setting {//设置类
         pictureSuffixButtonGroup.add(closePictureSuffixRadioButton);//组添加关闭图片后缀单选按钮
         openPictureSuffixRadioButton.addActionListener(_ -> {//为开启图片后缀单选按钮添加事件监听
             SettingState.pictureSuffix = false;//更新
-            updateMainPanel(false);//更新
+            updateFileDisplayMainPanel(false);//更新
         });
         openPictureSuffixRadioButton.addMouseListener(new MouseAdapter() {//为开启图片后缀单选按钮添加鼠标事件监听
             @Override
@@ -1649,7 +1649,7 @@ public class Setting {//设置类
         });
         closePictureSuffixRadioButton.addActionListener(_ -> {//为关闭图片后缀单选按钮添加事件监听
             SettingState.pictureSuffix = true;//更新
-            updateMainPanel(false);//更新
+            updateFileDisplayMainPanel(false);//更新
         });
         closePictureSuffixRadioButton.addMouseListener(new MouseAdapter() {//为关闭图片后缀单选按钮添加鼠标事件监听
             @Override
@@ -1859,469 +1859,6 @@ public class Setting {//设置类
         contentPanel.add(openIgnoreRadioButton);//面板添加开启忽略单选按钮
         contentPanel.add(closeIgnoreRadioButton);//面板添加关闭忽略单选按钮
 
-        JLabel GPUAccelerationLabel = new JLabel(SettingState.systemLanguage ? "GPU Acceleration State: " : "GPU加速状态：");//GPU加速标签
-        GPUAccelerationLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
-        GPUAccelerationLabel.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        GPUAccelerationLabel.addMouseListener(new MouseAdapter() {//为GPU加速标签添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Turn On GPU Acceleration Can Speed Up Loading And Display Image, If You Encounter Problem After Turning It On, Please Turn Off" : "开启GPU加速可以加快您的图片加载和显示速度，如果您在开启后遇到问题请关闭GPU加速"), GPUAccelerationLabel));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-                GPUAccelerationLabel.setForeground(Color.RED);//悬浮颜色
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-                GPUAccelerationLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
-            }
-        });
-        contentPanel.add(GPUAccelerationLabel);//开启GPU加速
-        JRadioButton openAccelerationRadioButton = new JRadioButton(SettingState.systemLanguage ? "Open" : "开启加速");//开启加速单选按钮
-        JRadioButton closeAccelerationRadioButton = new JRadioButton(SettingState.systemLanguage ? "Close" : "关闭加速");//关闭加速单选按钮
-        openAccelerationRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
-        openAccelerationRadioButton.setBackground(SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
-        openAccelerationRadioButton.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        closeAccelerationRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
-        closeAccelerationRadioButton.setBackground(SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
-        closeAccelerationRadioButton.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        if (SettingState.GPUAcceleration) {//根据设置状态判断
-            closeAccelerationRadioButton.setSelected(true);
-        } else {
-            openAccelerationRadioButton.setSelected(true);
-        }
-        ButtonGroup GPUAccelerationButtonGroup = new ButtonGroup();//命名策略组
-        GPUAccelerationButtonGroup.add(openAccelerationRadioButton);//组添加开启加速单选按钮
-        GPUAccelerationButtonGroup.add(closeAccelerationRadioButton);//组添加关闭加速单选按钮
-        openAccelerationRadioButton.addActionListener(_ -> {//为开启加速单选按钮添加事件监听
-            SettingState.GPUAcceleration = false;//更新
-            System.setProperty("sun.java2d.opengl", "false");//不使用openGL加速
-            System.setProperty("sun.java2d.d3d", "false");//不使用Direct3D加速
-        });
-        openAccelerationRadioButton.addMouseListener(new MouseAdapter() {//为开启加速单选按钮添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Turn On GPU Acceleration" : "开启GPU加速"), openAccelerationRadioButton));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-                openAccelerationRadioButton.setForeground(Color.RED);//悬浮颜色
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-                openAccelerationRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
-            }
-        });
-        closeAccelerationRadioButton.addActionListener(_ -> {//为关闭加速单选按钮添加事件监听
-            SettingState.GPUAcceleration = true;//更新
-            System.setProperty("sun.java2d.opengl", "true");//使用openGL加速
-            System.setProperty("sun.java2d.d3d", "true");//使用Direct3D加速
-            System.setProperty("sun.java2d.renderer", "sun.java2d.marlin.MarlinRenderingEngine");//使用Marlin渲染器
-        });
-        closeAccelerationRadioButton.addMouseListener(new MouseAdapter() {//为关闭加速单选按钮添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Turn Off GPU Acceleration" : "关闭GPU加速"), closeAccelerationRadioButton));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-                closeAccelerationRadioButton.setForeground(Color.RED);//悬浮颜色
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-                closeAccelerationRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
-            }
-        });
-        contentPanel.add(openAccelerationRadioButton);//面板添加开启加速单选按钮
-        contentPanel.add(closeAccelerationRadioButton);//面板添加关闭加速单选按钮
-
-        JLabel GIFStrategyLabel = new JLabel(SettingState.systemLanguage ? "Setting GIF Picture Strategy: " : "设置GIF策略：");
-        GIFStrategyLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
-        GIFStrategyLabel.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        GIFStrategyLabel.addMouseListener(new MouseAdapter() {//为GIF策略标签添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "In Thumbnail Image Panel, GIF Will Be Replayed When GIF Is Played More Than Maximum Frame, If You Want To Play More, You Can Increase Maximum Frames, But Correspondingly, Your CPU Burden Will Increase" : "在图片缩略图面板中，当GIF播放超过最大帧数时，GIF会重新播放，如果您想在缩略图更多播放GIF图片，可以增加最大帧数，但相应的，您的CPU负担会增加"), GIFStrategyLabel));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-                GIFStrategyLabel.setForeground(Color.RED);//悬浮颜色
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-                GIFStrategyLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
-            }
-        });
-        contentPanel.add(GIFStrategyLabel);//设置GIF策略
-        JTextField customGIFFrameAmountText = new JTextField(String.valueOf(SettingState.customGIFFrameAmount));//自定义GIF帧数量文本域
-        customGIFFrameAmountText.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        JRadioButton completePlayRadioButton = new JRadioButton(SettingState.systemLanguage ? "Complete Play" : "完整播放");//完整播放单选按钮
-        completePlayRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
-        completePlayRadioButton.setBackground(SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
-        completePlayRadioButton.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        if (SettingState.GIFStrategy) {//根据设置状态判断
-            completePlayRadioButton.setSelected(true);
-        }
-        customGIFFrameAmountText.addKeyListener(new KeyAdapter() {//为自定义GIF帧数量文本域添加键盘监听
-            @Override
-            public void keyPressed(KeyEvent e) {//如果键盘按下
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {//如果按下回车
-                    String inputText = customGIFFrameAmountText.getText();//获取输入文本
-                    boolean legalFlag = true;//合法输入标志
-                    if (inputText.isEmpty()) {//如果输入为空
-                        customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                        createBottomTipWindow(SettingState.systemLanguage ? "No Empty Input" : "输入不可为空");//提示
-                        legalFlag = false;//非法
-                    } else {//否则不为空
-                        if (inputText.length() > 8) {//如果输入过多
-                            customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "Do Not Enter Too Much" : "请勿输入过多");//提示
-                            return;//直接返回
-                        }
-                        for (int i = 0; i < inputText.length(); i++) {//遍历输入文本
-                            if (inputText.charAt(i) == '-' && i == 0) {//如果输入负数
-                                customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                                createBottomTipWindow(SettingState.systemLanguage ? "No Negative" : "请勿输入负数");//提示
-                                legalFlag = false;//非法
-                                break;//直接结束
-                            } else if (!Character.isDigit(inputText.charAt(i))) {//如果不是数字
-                                customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                                createBottomTipWindow(SettingState.systemLanguage ? "No Illegal Character" : "请勿输入非法字符");//提示
-                                legalFlag = false;//非法
-                                break;//直接结束
-                            }
-                        }
-                    }
-                    if (legalFlag) {//如果合法
-                        int value = Integer.parseInt(inputText);//获取数值
-                        if (value > 10000) {//如果数值过大
-                            customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "Do Not Enter Too Large" : "请勿输入过大的数");//提示
-                            return;//直接返回
-                        }
-                        SettingState.GIFStrategy = false;//更新
-                        completePlayRadioButton.setSelected(false);//取消选中
-                        MAX_GIF_FRAME_AMOUNT = value;//设置最大GIF帧数量
-                        SettingState.customGIFFrameAmount = MAX_GIF_FRAME_AMOUNT;//存储
-                        settingDialog.requestFocusInWindow();//返回聚焦
-                        handleRefresh();//刷新
-                    }
-                    e.consume();//阻止默认行为
-                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {//如果按下ESC
-                    settingDialog.requestFocusInWindow();//返回聚焦
-                    e.consume();//阻止默认行为
-                }
-            }
-        });
-        customGIFFrameAmountText.addFocusListener(new FocusAdapter() {//为自定义GIF帧数量文本域添加聚焦监听
-            @Override
-            public void focusLost(FocusEvent e) {//如果失去聚焦
-                String inputText = customGIFFrameAmountText.getText();//获取输入文本
-                boolean legalFlag = true;//合法输入标志
-                if (inputText.isEmpty()) {//如果输入为空
-                    customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                    createBottomTipWindow(SettingState.systemLanguage ? "No Empty Input" : "输入不可为空");//提示
-                    legalFlag = false;//非法
-                } else {//否则不为空
-                    if (inputText.length() > 8) {//如果输入过多
-                        customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                        createBottomTipWindow(SettingState.systemLanguage ? "Do Not Enter Too Much" : "请勿输入过多");//提示
-                        return;//直接返回
-                    }
-                    for (int i = 0; i < inputText.length(); i++) {//遍历输入文本
-                        if (inputText.charAt(i) == '-' && i == 0) {//如果输入负数
-                            customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "No Negative" : "请勿输入负数");//提示
-                            legalFlag = false;//非法
-                            break;//直接结束
-                        } else if (!Character.isDigit(inputText.charAt(i))) {//如果不是数字
-                            customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "No Illegal Character" : "请勿输入非法字符");//提示
-                            legalFlag = false;//非法
-                            break;//直接结束
-                        }
-                    }
-                }
-                if (legalFlag) {//如果合法
-                    int value = Integer.parseInt(inputText);//获取数值
-                    if (value > 10000) {//如果数值过大
-                        customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                        createBottomTipWindow(SettingState.systemLanguage ? "Do Not Enter Too Large" : "请勿输入过大的数");//提示
-                        return;//直接返回
-                    }
-                    SettingState.GIFStrategy = false;//更新
-                    completePlayRadioButton.setSelected(false);//取消选中
-                    MAX_GIF_FRAME_AMOUNT = value;//设置最大GIF帧数量
-                    SettingState.customGIFFrameAmount = MAX_GIF_FRAME_AMOUNT;//存储
-                    settingDialog.requestFocusInWindow();//返回聚焦
-                    handleRefresh();//刷新
-                }
-            }
-        });
-        customGIFFrameAmountText.addMouseListener(new MouseAdapter() {//为自定义GIF帧数量文本域添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Set Maximum GIF Frame, Please Don't Enter Negative Or Illegal Character, GIF Will Not Play When Input Is 0" : "设置GIF最大帧数，请不要输入负数或非法字符，当输入为0时GIF不播放"), customGIFFrameAmountText));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-            }
-        });
-        completePlayRadioButton.addActionListener(_ -> {//为完整播放单选按钮添加事件监听
-            if (completePlayRadioButton.isSelected()) {//如果被选中
-                SettingState.GIFStrategy = true;//更新
-                MAX_GIF_FRAME_AMOUNT = 10000;//最大GIF帧数量设为无穷（实则10000）
-                handleRefresh();//刷新
-                createBottomTipWindow(SettingState.systemLanguage ? "Please Note That Complete Playing GIF Picture May Increase CPU Burden, Carefully" : "请注意，完整播放缩略图GIF图片可能会大大增加CPU负担，请谨慎开启");//提示
-            } else {//否则
-                SettingState.GIFStrategy = false;//更新
-                MAX_GIF_FRAME_AMOUNT = SettingState.customGIFFrameAmount;//设置最大GIF帧数量
-                handleRefresh();//刷新
-            }
-        });
-        completePlayRadioButton.addMouseListener(new MouseAdapter() {//为完整播放单选按钮添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Set Full GIF Play, Please Turn On This Item With Caution, As This Will Tremendously Increase CPU Burden, And May Trigger Freeze Even Crash" : "设置完整播放GIF，请谨慎打开此项，这会大大加重您的CPU负担，可能导致软件卡顿甚至闪退"), completePlayRadioButton));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-                completePlayRadioButton.setForeground(Color.RED);//悬浮颜色
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-                completePlayRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
-            }
-        });
-        contentPanel.add(customGIFFrameAmountText);//面板添加自定义GIF帧数量文本域
-        contentPanel.add(completePlayRadioButton);//面板添加完整播放单选按钮
-
-        JLabel cacheStrategyLabel = new JLabel(SettingState.systemLanguage ? "Setting Cache Picture Strategy: " : "设置缓存策略：");//缓存策略标签
-        cacheStrategyLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
-        cacheStrategyLabel.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        cacheStrategyLabel.addMouseListener(new MouseAdapter() {//为缓存策略标签添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "When Image Loaded, It Will Be Put Into Cache, Cache Will Be Clean When Cache Exceed Maximum Value, If You Want To Reduce Memory Usage, You Can Decrease Maximum Cache Value, But Correspondingly, Image Will Load Slower" : "当图片加载后会放入缓存，当缓存超过最大值时会清除缓存，如果您想减少软件内存占用，可以降低缓存最大值，但相应的，您的图片加载速度会变慢"), cacheStrategyLabel));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-                cacheStrategyLabel.setForeground(Color.RED);//悬浮颜色
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-                cacheStrategyLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
-            }
-        });
-        contentPanel.add(cacheStrategyLabel);//设置缓存策略
-        JTextField customCacheRemainAmountText = new JTextField(String.valueOf(SettingState.customCacheRemainAmount));//自定义缓存数量文本域
-        customCacheRemainAmountText.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        JRadioButton closeCacheCleanRadioButton = new JRadioButton(SettingState.systemLanguage ? "Close Clean" : "关闭清理");//关闭清理单选按钮
-        closeCacheCleanRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
-        closeCacheCleanRadioButton.setBackground(SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
-        closeCacheCleanRadioButton.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        if (SettingState.cacheStrategy) {//根据设置状态判断
-            closeCacheCleanRadioButton.setSelected(true);
-        }
-        customCacheRemainAmountText.addKeyListener(new KeyAdapter() {//为自定义缓存数量文本域添加键盘监听
-            @Override
-            public void keyPressed(KeyEvent e) {//如果键盘按下
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {//如果按下回车
-                    String inputText = customCacheRemainAmountText.getText();//获取输入文本
-                    boolean legalFlag = true;//合法输入标志
-                    if (inputText.isEmpty()) {//如果输入为空
-                        customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                        createBottomTipWindow(SettingState.systemLanguage ? "No Empty Input" : "输入不可为空");//提示
-                        legalFlag = false;//非法
-                    } else {//否则不为空
-                        if (inputText.length() > 8) {//如果输入过多
-                            customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "Do Not Enter Too Much" : "请勿输入过多");//提示
-                            return;//直接返回
-                        }
-                        for (int i = 0; i < inputText.length(); i++) {//遍历输入文本
-                            if (inputText.charAt(i) == '-' && i == 0) {//如果输入负数
-                                customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                                createBottomTipWindow(SettingState.systemLanguage ? "No Negative" : "请勿输入负数");//提示
-                                legalFlag = false;//非法
-                                break;//直接结束
-                            } else if (!Character.isDigit(inputText.charAt(i))) {//如果不是数字
-                                customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                                createBottomTipWindow(SettingState.systemLanguage ? "No Illegal Character" : "请勿输入非法字符");//提示
-                                legalFlag = false;//非法
-                                break;//直接结束
-                            }
-                        }
-                    }
-                    if (legalFlag) {//如果合法
-                        int value = Integer.parseInt(inputText);//获取数值
-                        if (value > 1000000) {//如果数值过大
-                            customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "Do Not Enter Too Large" : "请勿输入过大的数");//提示
-                            return;//直接返回
-                        }
-                        SettingState.cacheStrategy = false;//更新
-                        closeCacheCleanRadioButton.setSelected(false);//取消选中
-                        MAX_CACHE_REMAIN_AMOUNT = value;//设置最大缓存保存数量
-                        SettingState.customCacheRemainAmount = MAX_CACHE_REMAIN_AMOUNT;//存储
-                        settingDialog.requestFocusInWindow();//返回聚焦
-                    }
-                    e.consume();//阻止默认行为
-                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {//如果按下ESC
-                    settingDialog.requestFocusInWindow();//返回聚焦
-                    e.consume();//阻止默认行为
-                }
-            }
-        });
-        customCacheRemainAmountText.addFocusListener(new FocusAdapter() {//为自定义缓存保留数量添加聚焦监听
-            @Override
-            public void focusLost(FocusEvent e) {//如果失去聚焦
-                String inputText = customCacheRemainAmountText.getText();//获取输入文本
-                boolean legalFlag = true;//合法输入标志
-                if (inputText.isEmpty()) {//如果输入为空
-                    customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                    createBottomTipWindow(SettingState.systemLanguage ? "No Empty Input" : "输入不可为空");//提示
-                    legalFlag = false;//非法
-                } else {//否则不为空
-                    if (inputText.length() > 8) {//如果输入过多
-                        customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                        createBottomTipWindow(SettingState.systemLanguage ? "Do Not Enter Too Much" : "请勿输入过多");//提示
-                        return;//直接返回
-                    }
-                    for (int i = 0; i < inputText.length(); i++) {//遍历输入文本
-                        if (inputText.charAt(i) == '-' && i == 0) {//如果输入负数
-                            customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "No Negative" : "请勿输入负数");//提示
-                            legalFlag = false;//非法
-                            break;//直接结束
-                        } else if (!Character.isDigit(inputText.charAt(i))) {//如果不是数字
-                            customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "No Illegal Character" : "请勿输入非法字符");//提示
-                            legalFlag = false;//非法
-                            break;//直接结束
-                        }
-                    }
-                }
-                if (legalFlag) {//如果合法
-                    int value = Integer.parseInt(inputText);//获取数值
-                    if (value > 1000000) {//如果数值过大
-                        customCacheRemainAmountText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                        createBottomTipWindow(SettingState.systemLanguage ? "Do Not Enter Too Large" : "请勿输入过大的数");//提示
-                        return;//直接返回
-                    }
-                    SettingState.cacheStrategy = false;//更新
-                    closeCacheCleanRadioButton.setSelected(false);//取消选中
-                    MAX_CACHE_REMAIN_AMOUNT = value;//设置最大缓存保存数量
-                    SettingState.customCacheRemainAmount = MAX_CACHE_REMAIN_AMOUNT;//存储
-                    settingDialog.requestFocusInWindow();//返回聚焦
-                }
-            }
-        });
-        customCacheRemainAmountText.addMouseListener(new MouseAdapter() {//为自定义缓存保留数量添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Set Maximum Cache Value, Please Don't Enter Negative Or Illegal Character, Cache Will Turn Off When Input Is 0" : "设置缓存最大值，请不要输入负数或非法字符，当输入为0时彻底关闭缓存"), customCacheRemainAmountText));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-            }
-        });
-        closeCacheCleanRadioButton.addActionListener(_ -> {//为关闭清理单选按钮添加事件监听
-            if (closeCacheCleanRadioButton.isSelected()) {//如果被选中
-                SettingState.cacheStrategy = true;//更新
-                MAX_CACHE_REMAIN_AMOUNT = 1000000;//最大缓存清理数量设为无穷（实则为1000000）
-                createBottomTipWindow(SettingState.systemLanguage ? "Please Note That Close Cache Clean May Increase Memory Burden, Carefully" : "请注意，关闭缓存清理可能会大大增加内存负担，请谨慎关闭");//提示
-            } else {//否则
-                SettingState.cacheStrategy = false;//更新
-                MAX_CACHE_REMAIN_AMOUNT = SettingState.customCacheRemainAmount;//设置最大缓存保存数量
-            }
-        });
-        closeCacheCleanRadioButton.addMouseListener(new MouseAdapter() {//为关闭清理单选按钮添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Set Not Clean Cache, Please Turn On This Item With Caution, This Will Tremendously Increase Memory Burden, And May Trigger Freeze Even Crash" : "设置不清理缓存，请谨慎打开此项，这会大大加重您的内存负担，可能导致软件卡顿甚至闪退"), closeCacheCleanRadioButton));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-                closeCacheCleanRadioButton.setForeground(Color.RED);//悬浮颜色
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-                closeCacheCleanRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
-            }
-        });
-        contentPanel.add(customCacheRemainAmountText);//面板添加自定义缓存保留数量文本域
-        contentPanel.add(closeCacheCleanRadioButton);//面板添加关闭清理单选按钮
-
         JLabel cleanTimeLabel = new JLabel(SettingState.systemLanguage ? "Recycle Bin Clean Time: " : "回收清理时间：");//清理时间标签
         cleanTimeLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
         cleanTimeLabel.setFont(new Font("楷体", PLAIN, 20));//设置字体
@@ -2472,10 +2009,10 @@ public class Setting {//设置类
         });
         closeRecycleCleanRadioButton.addActionListener(_ -> {//为关闭清理单选按钮添加事件监听
             if (closeRecycleCleanRadioButton.isSelected()) {//如果被选中
-                SettingState.cacheStrategy = true;//更新
+                SettingState.recycleStrategy = true;//更新
                 createBottomTipWindow(SettingState.systemLanguage ? "Please Note That Close Automatic Clean Of Picture Recycle Bin May Take Up Plenty Of Disk Space, Carefully" : "请注意，关闭图片回收站自动清理可能会占用大量磁盘空间，请谨慎关闭");//提示
             } else {//否则
-                SettingState.cacheStrategy = false;//更新
+                SettingState.recycleStrategy = false;//更新
             }
         });
         closeRecycleCleanRadioButton.addMouseListener(new MouseAdapter() {//为关闭清理单选按钮添加鼠标事件监听
@@ -2501,32 +2038,6 @@ public class Setting {//设置类
         });
         contentPanel.add(customCleanTimeText);//面板添加自定义清理时间文本域
         contentPanel.add(closeRecycleCleanRadioButton);//面板添加关闭清理单选按钮
-
-        JLabel pictureDirectoryLabel = new JLabel(SettingState.systemLanguage ? "Specify System Picture Directory: " : "指定图片路径：");//图片路径标签
-        pictureDirectoryLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
-        pictureDirectoryLabel.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        pictureDirectoryLabel.addMouseListener(new MouseAdapter() {//为图片路径标签添加鼠标事件监听
-            @Override
-            public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "If Software Prompt You Unable To Find System Picture Path Or Want To Change Picture Path, You Can Modify Here" : "如果软件提示您找不到系统图片路径或想要更改图片路径，您可以在这里进行修改"), pictureDirectoryLabel));//展示提示窗口（鼠标悬浮一秒后展示）
-                hoverTimer.setRepeats(false);//设置计时器不重复
-                hoverTimer.start();//开始计时
-                pictureDirectoryLabel.setForeground(Color.RED);//悬浮颜色
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {//如果鼠标离开
-                if (hoverTimer != null) {//如果不为空
-                    hoverTimer.stop();//计时器结束
-                }
-                if (buttonHoverTipWindow != null) {//如果提示信息不为空
-                    buttonHoverTipWindow.dispose();//释放提示信息
-                    buttonHoverTipWindow = null;//提示信息置空
-                }
-                pictureDirectoryLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
-            }
-        });
-        contentPanel.add(pictureDirectoryLabel);//指定图片路径
 
         JButton aboutButton = new JButton(SettingState.systemLanguage ? "About Us" : "关于我们");//关于我们按钮
         aboutButton.setBackground(SETTING_BUTTON_COLOR);//设置背景颜色
@@ -2734,11 +2245,6 @@ public class Setting {//设置类
                 SettingState.pictureSuffix = false;
                 SettingState.renameStrategy = false;
                 SettingState.searchStrategy = false;
-                SettingState.GPUAcceleration = false;
-                SettingState.customGIFFrameAmount = 5;
-                SettingState.GIFStrategy = false;
-                SettingState.customCacheRemainAmount = 500;
-                SettingState.cacheStrategy = false;
                 SettingState.customRecycleCleanTime = 30;
                 SettingState.recycleStrategy = false;
                 SettingState.masterVolume = 88;
@@ -2763,7 +2269,7 @@ public class Setting {//设置类
                 switchBGM();//切换BGM
 
                 GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);//取消窗口全屏
-                pictureManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
+                diskManagementSystemFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
                 progressWindow.setAlwaysOnTop(false);//设置不永远在最上层
 
                 settingDialog.dispose();//释放
@@ -2792,7 +2298,7 @@ public class Setting {//设置类
         });
         contentPanel.add(resetSettingButton);//面板添加重置设置按钮
 
-        settingDialog = new JDialog(pictureManagementSystemFrame, SettingState.systemLanguage ? "Setting" : "设置", true);//创建设置对话窗口
+        settingDialog = new JDialog(diskManagementSystemFrame, SettingState.systemLanguage ? "Setting" : "设置", true);//创建设置对话窗口
         settingDialog.setIconImage(new ImageIcon("src/material/image/dialogSetting.png").getImage());//设置图标
         settingDialog.setLayout(new BorderLayout());//设置布局
         settingDialog.add(contentPanel, BorderLayout.CENTER);//把内容面板添加到中心
@@ -2815,74 +2321,6 @@ public class Setting {//设置类
         });
         settingDialog.addWindowListener(new WindowAdapter() {//为设置窗口添加窗口监听
             private static boolean reopenSettingsDialog = false;//判断是否需要重新打开窗口
-
-            @Override
-            public void windowClosing(WindowEvent e) {//如果窗口正在关闭
-                String customGIFFrameAmountInputText = customGIFFrameAmountText.getText();//获取自定义GIF帧数量输入文本
-                if (!Objects.equals(customGIFFrameAmountInputText, String.valueOf(SettingState.customGIFFrameAmount))) {//如果发生变化，防止没有按enter就离开
-                    boolean legalFlag = true;//合法输入标志
-                    if (customGIFFrameAmountInputText.isEmpty()) {//如果输入为空
-                        customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                        createBottomTipWindow(SettingState.systemLanguage ? "No Empty Input" : "输入不可为空");//提示
-                        legalFlag = false;//非法
-                    } else {//否则不为空
-                        for (int i = 0; i < customGIFFrameAmountInputText.length(); i++) {//遍历输入文本
-                            if (customGIFFrameAmountInputText.charAt(i) == '-' && i == 0) {//如果输入负数
-                                customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                                createBottomTipWindow(SettingState.systemLanguage ? "No Negative" : "请勿输入负数");//提示
-                                legalFlag = false;//非法
-                                break;//直接结束
-                            } else if (!Character.isDigit(customGIFFrameAmountInputText.charAt(i))) {//如果不是数字
-                                customGIFFrameAmountText.setText(String.valueOf(SettingState.customGIFFrameAmount));//返回原先数据
-                                createBottomTipWindow(SettingState.systemLanguage ? "No Illegal Character" : "请勿输入非法字符");//提示
-                                legalFlag = false;//非法
-                                break;//直接结束
-                            }
-                        }
-                    }
-                    if (legalFlag) {//如果合法
-                        SettingState.GIFStrategy = false;//更新
-                        completePlayRadioButton.setSelected(false);//取消选中
-                        MAX_GIF_FRAME_AMOUNT = Integer.parseInt(customGIFFrameAmountInputText);//设置最大GIF帧数量
-                        SettingState.customGIFFrameAmount = MAX_GIF_FRAME_AMOUNT;//存储
-                        settingDialog.requestFocusInWindow();//返回聚焦
-                    } else {//否则不合法
-                        reopenSettingsDialog = true;//需要重新打开窗口
-                    }
-                }
-                String customCacheRemainAmountInputText = customCleanTimeText.getText();//获取自定义缓存保留数量输入文本
-                if (!Objects.equals(customCacheRemainAmountInputText, String.valueOf(SettingState.customCacheRemainAmount))) {//如果发生变化，防止没有按enter就离开
-                    boolean legalFlag = true;//合法输入标志
-                    for (int i = 0; i < customCacheRemainAmountInputText.length(); i++) {//遍历输入文本
-                        if (customCacheRemainAmountInputText.charAt(i) == '-' && i == 0) {//如果输入负数
-                            customCleanTimeText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "No Negative" : "请勿输入负数");//提示
-                            legalFlag = false;//非法
-                            break;//直接结束
-                        } else if (!Character.isDigit(customCacheRemainAmountInputText.charAt(i))) {//如果不是数字
-                            customCleanTimeText.setText(String.valueOf(SettingState.customCacheRemainAmount));//返回原先数据
-                            createBottomTipWindow(SettingState.systemLanguage ? "No Illegal Character" : "请勿输入非法字符");//提示
-                            legalFlag = false;//非法
-                            break;//直接结束
-                        }
-                    }
-                    if (legalFlag) {//如果合法
-                        SettingState.cacheStrategy = false;//更新
-                        closeRecycleCleanRadioButton.setSelected(false);//取消选中
-                        MAX_CACHE_REMAIN_AMOUNT = Integer.parseInt(customCacheRemainAmountInputText);//设置最大缓存保存数量
-                        SettingState.customCacheRemainAmount = MAX_CACHE_REMAIN_AMOUNT;//存储
-                        settingDialog.requestFocusInWindow();//返回聚焦
-                    } else {//否则不合法
-                        reopenSettingsDialog = true;//需要重新打开窗口
-                    }
-                }
-                if (bottomTipWindow != null && bottomTipWindow.isVisible()) {//如果底部提示窗口可见
-                    bottomTipWindow.dispose();//底部提示窗口置空
-                }
-                if (buttonHoverTipWindow != null && buttonHoverTipWindow.isVisible()) {//如果按钮提示窗口不为空
-                    buttonHoverTipWindow.dispose();//释放按钮提示窗口
-                }
-            }
 
             @Override
             public void windowDeactivated(WindowEvent e) {//如果窗口没有激活

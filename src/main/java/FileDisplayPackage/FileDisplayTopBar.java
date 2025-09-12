@@ -34,7 +34,7 @@ import static FileDisplayPackage.FileDisplayMainPanel.*;
 import static FileDisplayPackage.FileDisplayPopupMenu.administratorJudgement;
 import static java.awt.Font.PLAIN;
 
-public class FileDisplayTopBar {//图片预览顶部栏
+public class FileDisplayTopBar {//文件展示顶部栏
     public static final JPanel topBarPanel = new JPanel();//顶部面板：用于放置按钮等组件
     public static final JButton retreatButton = new JButton();//后退按钮
     public static final JButton advanceButton = new JButton();//前进按钮
@@ -48,8 +48,8 @@ public class FileDisplayTopBar {//图片预览顶部栏
     public static JComboBox<String> sortComboBox = new JComboBox<>(new String[]{Main.SettingState.systemLanguage ? "Sort By Name (Ascending Order)" : "按名称排序（升序）", Main.SettingState.systemLanguage ? "Sort By Date (Ascending Order)" : "按日期排序（升序）", Main.SettingState.systemLanguage ? "Sort By Type (Ascending Order)" : "按类型排序（升序）", Main.SettingState.systemLanguage ? "Sort By Size (Ascending Order)" : "按大小排序（升序）"});//排序列表
 
     public static JWindow buttonHoverTipWindow = null;//按钮悬浮提示窗口
-    public static JDialog singleFileRenameDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Rename" : "重命名", true);//单文件重命名对话窗口
-    public static JDialog multipleFileRenameDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Rename" : "重命名", true);//多文件重命名对话窗口
+    public static JDialog singleFileRenameDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Rename" : "重命名", true);//单文件重命名对话窗口
+    public static JDialog multipleFileRenameDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Rename" : "重命名", true);//多文件重命名对话窗口
 
     public static String currentFolder = null;//当前所在文件夹
     public static int folderListIndex = -1;//进入过的文件夹路径索引：防止循环文件夹出错
@@ -230,16 +230,6 @@ public class FileDisplayTopBar {//图片预览顶部栏
         renameButton.setSize(24, 24);
         removeButton.setSize(24, 24);
         sortComboBox.setPreferredSize(new Dimension(Main.SettingState.systemLanguage ? 400 : 235, 34));//设置大小
-
-//        retreatButton.setBackground(BAR_BUTTON_COLOR);//设置背景颜色
-//        advanceButton.setBackground(BAR_BUTTON_COLOR);
-//        upperLayerButton.setBackground(BAR_BUTTON_COLOR);
-//        refreshButton.setBackground(BAR_BUTTON_COLOR);
-//        cutButton.setBackground(BAR_BUTTON_COLOR);
-//        copyButton.setBackground(BAR_BUTTON_COLOR);
-//        pasteButton.setBackground(BAR_BUTTON_COLOR);
-//        renameButton.setBackground(BAR_BUTTON_COLOR);
-//        removeButton.setBackground(BAR_BUTTON_COLOR);
 
         sortComboBox.setFont(new Font("楷体", PLAIN, 23));
 
@@ -689,10 +679,10 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     }
                 }
             } else {//否则
-                DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                DirectoryTree.setCurrentFileList(detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
             }
             directoryField.setTextField();//设置文件路径为当前文件夹
-            updateMainPanel(false);//通知更新图片预览面板
+            updateFileDisplayMainPanel(false);//通知更新图片预览面板
             directoryManipulationButtonEnableJudgement();//按钮判断
         }
     }
@@ -716,10 +706,10 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     }
                 }
             } else {//否则
-                DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                DirectoryTree.setCurrentFileList(detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
             }
             directoryField.setTextField();//设置文件路径为当前文件夹
-            updateMainPanel(false);//通知更新图片预览面板
+            updateFileDisplayMainPanel(false);//通知更新图片预览面板
             directoryManipulationButtonEnableJudgement();//按钮判断
         }
     }
@@ -734,8 +724,8 @@ public class FileDisplayTopBar {//图片预览顶部栏
             if (currentFileFolder.getParent() != null) {//如果该文件夹有父母
                 updateFolder(currentFileFolder.getParent());//设置当前文件夹为父母并更新当前文件夹和文件夹列表
                 directoryField.setTextField();//设置文件路径为当前文件夹
-                DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
-                updateMainPanel(false);//通知更新图片预览面板
+                DirectoryTree.setCurrentFileList(detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                updateFileDisplayMainPanel(false);//通知更新图片预览面板
                 directoryManipulationButtonEnableJudgement();//目录操作按钮判断
             }
         }
@@ -753,7 +743,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
             } else {//否则
                 DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
             }
-            updateMainPanel(false);//通知更新
+            updateFileDisplayMainPanel(false);//通知更新
             fileManipulationButtonEnableJudgement(getSelectionThumbnailItemList().size());//文件操作按钮判断
             directoryManipulationButtonEnableJudgement();//目录操作按钮判断
             FileDisplayBottomBar.historyManipulationButtonEnableJudgement();//历史操作按钮判断
@@ -830,7 +820,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             handleErrorLog(e.getMessage());//处理错误日志
                             throw new RuntimeException(e);//捕获异常
                         }
-                        updateMainPanel(true);//通知更新
+                        updateFileDisplayMainPanel(true);//通知更新
                         if (isCutOperation) {//如果是剪切操作
                             FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.MOVE, sources, null, "cutToCloud", null, targetStringList, true));//记录文件移动操作，原文件列表，目标文件列表，当前文件夹
                             clipboardFiles.clear();//清空剪贴板
@@ -894,7 +884,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     @Override
                     protected void done() {//完成时
                         DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
-                        updateMainPanel(true);//通知更新
+                        updateFileDisplayMainPanel(true);//通知更新
                         if (isCutOperation) {//如果是剪切操作
                             pasteButton.setEnabled(false);//设置不可粘贴
                             if (isCloudOperation) {//如果是云盘操作
@@ -1076,7 +1066,6 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             createBottomTipWindow(Main.SettingState.systemLanguage ? "Failure Rename: " + errorMessage : "重命名失败：" + errorMessage);//提示
                         }
                     }
-                    thumbnailCache.entrySet().removeIf(entry -> entry.getKey().startsWith(oldFile.getAbsolutePath()));//清除缓存防止有与原名称相同的图片与新名称图片冲突
                     if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
                         try {
                             List<String> newFileNameStringList = handleUserSaveUserUploadPicture(Collections.singletonList(newFile), false);//上传新文件
@@ -1095,7 +1084,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, Collections.singletonList(oldFile), Collections.singletonList(newFile), oldFile.getAbsolutePath(), null, null, false));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
                         DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                     }
-                    updateMainPanel(false);//通知更新
+                    updateFileDisplayMainPanel(false);//通知更新
                     singleFileRenameDialog.dispose();//释放
                     if (itemHoverTipWindow != null) {//如果提示信息不为空
                         itemHoverTipWindow.dispose();//释放提示信息
@@ -1128,7 +1117,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
             contentPanel.add(singleFileRenameTextField);
             contentPanel.add(confirmSingleFileRenameButton);
 
-            singleFileRenameDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Rename" : "重命名", true);//创建单文件重命名对话窗口
+            singleFileRenameDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Rename" : "重命名", true);//创建单文件重命名对话窗口
             singleFileRenameDialog.setIconImage(new ImageIcon("src/material/image/rename.png").getImage());//设置图标
             singleFileRenameDialog.setLayout(new BorderLayout());//设置布局
             singleFileRenameDialog.add(contentPanel, BorderLayout.CENTER);//内容面板添加到中心
@@ -1533,7 +1522,6 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             }
                         }
                         Files.move(oldFile.toPath(), newFile.toPath());//覆盖原文件
-                        thumbnailCache.entrySet().removeIf(entry -> entry.getKey().startsWith(oldFile.getAbsolutePath()));//清除缓存防止有与原名称相同的图片与新名称图片冲突
                         sources.add(oldFile);//往列表添加旧文件
                         targets.add(newFile);//往列表添加新文件
                     }
@@ -1569,7 +1557,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, sources, targets, null, null, null, false));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
                     DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                 }
-                updateMainPanel(false);//通知更新
+                updateFileDisplayMainPanel(false);//通知更新
                 multipleFileRenameDialog.dispose();//释放
             });
             confirmMultipleFileNumberRenameButton.addMouseListener(new MouseAdapter() {//为确认多文件编号重命名按钮添加鼠标监听
@@ -1881,7 +1869,6 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             }
                         }
                         Files.move(oldFile.toPath(), newFile.toPath());//覆盖原文件
-                        thumbnailCache.entrySet().removeIf(entry -> entry.getKey().startsWith(oldFile.getAbsolutePath()));//清除缓存防止有与原名称相同的图片与新名称图片冲突
                         sources.add(oldFile);//往列表添加旧文件
                         targets.add(newFile);//往列表添加新文件
                     }
@@ -1917,7 +1904,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, sources, targets, null, null, null, false));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
                     DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                 }
-                updateMainPanel(false);//通知更新
+                updateFileDisplayMainPanel(false);//通知更新
                 multipleFileRenameDialog.dispose();//释放
             });
             confirmMultipleFileInformationRenameButton.addMouseListener(new MouseAdapter() {//为确认多文件信息重命名按钮添加鼠标监听
@@ -2014,7 +2001,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                 }
             });
 
-            multipleFileRenameDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Rename" : "重命名", true);//创建多文件重命名对话窗口
+            multipleFileRenameDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Rename" : "重命名", true);//创建多文件重命名对话窗口
             multipleFileRenameDialog.setIconImage(new ImageIcon("src/material/image/rename.png").getImage());//设置图标
             multipleFileRenameDialog.setLayout(new BorderLayout());//设置布局
             multipleFileRenameDialog.add(multipleFileRenameSwitchPanel, BorderLayout.NORTH);//多文件重命名切换面板添加到北部
@@ -2074,7 +2061,6 @@ public class FileDisplayTopBar {//图片预览顶部栏
                                 String uniqueName = String.format("%s%s_%s_%d_%s.%s", "$", timestamp, safeBaseName, file.hashCode(), file.getName(), FilenameUtils.getExtension(file.getName()));//生成独特回收文件名：包含删除时间（精确到毫秒）与文件哈希值，防止快速连续操作冲突
                                 Path target = recycleBin.resolve(uniqueName);//把回收站地址和文件名进行拼接
                                 Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);//通过替换方案把原文件全部移动到回收站
-                                thumbnailCache.entrySet().removeIf(entry -> entry.getKey().startsWith(file.getAbsolutePath()));//清除缓存防止有与原名称相同的图片与新名称图片冲突
                                 operationRecycleFiles.add(target.toFile());//记录被删除文件
                                 Thread.sleep(1);//暂停1ms保证每个文件有不同的时间戳
                             }
@@ -2108,7 +2094,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                         }
                         new Timer(100, evt -> {//添加100ms延时确保组件完全卸载再通知更新
-                            updateMainPanel(false);//更新面板
+                            updateFileDisplayMainPanel(false);//更新面板
                             fileManipulationButtonEnableJudgement(list.size());//更新文件操作按钮状态
                             ((Timer) evt.getSource()).stop();//停止计时器
                         }).start();//开始计时器
@@ -2129,7 +2115,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     removeTipClip.setFramePosition(0);//重置播放位置
                     removeTipClip.start();//开始播放音效
                 }
-                int confirm = JOptionPane.showConfirmDialog(Main.pictureManagementSystemFrame, (Main.SettingState.systemLanguage ? "Are You Sure To Remove The " : "确定要删除选中的 ") + list.size() + (Main.SettingState.systemLanguage ? " Selected Picture?\nRemoved Picture Are Placed In Recycle Bin\nYou Can Undo This Operation To Recover\nPicture Would Only Completely Removed By Emptying Recycle Bin" : " 张图片吗？\n删除后的图片将放入回收站\n可以撤销删除操作恢复图片\n只有清空回收站才能彻底删除图片"), Main.SettingState.systemLanguage ? "Remove Confirm" : "确认删除", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);//创建确认信息
+                int confirm = JOptionPane.showConfirmDialog(Main.diskManagementSystemFrame, (Main.SettingState.systemLanguage ? "Are You Sure To Remove The " : "确定要删除选中的 ") + list.size() + (Main.SettingState.systemLanguage ? " Selected Picture?\nRemoved Picture Are Placed In Recycle Bin\nYou Can Undo This Operation To Recover\nPicture Would Only Completely Removed By Emptying Recycle Bin" : " 张图片吗？\n删除后的图片将放入回收站\n可以撤销删除操作恢复图片\n只有清空回收站才能彻底删除图片"), Main.SettingState.systemLanguage ? "Remove Confirm" : "确认删除", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);//创建确认信息
                 if (confirm == JOptionPane.YES_OPTION) {//如果确认
                     List<File> operationRecycleFiles = new ArrayList<>();//临时存储回收文件列表
                     SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");//设置时间戳格式（不采用含冒号和空格的格式防止系统不允许，精确到毫秒防止文件冲突）
@@ -2155,7 +2141,6 @@ public class FileDisplayTopBar {//图片预览顶部栏
                                     String uniqueName = String.format("%s%s_%s_%d_%s", "$", timestamp, time, file.hashCode(), file.getName());//生成独特回收文件名：包含删除时间（精确到毫秒）、删除时间戳与文件哈希值，防止快速连续操作冲突
                                     Path target = recycleBin.resolve(uniqueName);//把回收站地址和文件名进行拼接
                                     Files.move(file.toPath(), target, StandardCopyOption.REPLACE_EXISTING);//通过替换方案把原文件全部移动到回收站
-                                    thumbnailCache.entrySet().removeIf(entry -> entry.getKey().startsWith(file.getAbsolutePath()));//清除缓存防止有与原名称相同的图片与新名称图片冲突
                                     operationRecycleFiles.add(target.toFile());//记录被删除文件
                                     Thread.sleep(1);//暂停1ms保证每个文件有不同的时间戳
                                 }
@@ -2189,7 +2174,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                                 DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                             }
                             new Timer(100, evt -> {//添加100ms延时确保组件完全卸载再通知更新
-                                updateMainPanel(false);//更新面板
+                                updateFileDisplayMainPanel(false);//更新面板
                                 fileManipulationButtonEnableJudgement(list.size());//更新文件操作按钮状态
                                 ((Timer) evt.getSource()).stop();//停止计时器
                             }).start();//开始计时器
@@ -2250,7 +2235,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
             } else if (multipleFileRenameDialog.isVisible()) {//如果用户窗口可见
                 buttonHoverTipWindow = new JWindow(multipleFileRenameDialog);//创建提示窗口（设置父组件防止覆盖）
             } else {//否则
-                buttonHoverTipWindow = new JWindow(Main.pictureManagementSystemFrame);//创建提示窗口（设置父组件防止覆盖）
+                buttonHoverTipWindow = new JWindow(Main.diskManagementSystemFrame);//创建提示窗口（设置父组件防止覆盖）
             }
         }
         JLabel content = new JLabel(tipInformation);//创建内容标签
@@ -2284,7 +2269,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     if (!Objects.equals(Main.SettingState.userAccount, "")) {//如果用户没有退出登录
                         try {
                             DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
-                            updateMainPanel(false);//通知更新图片预览面板
+                            updateFileDisplayMainPanel(false);//通知更新图片预览面板
                             directoryManipulationButtonEnableJudgement();//按钮判断
                         } catch (IOException e) {
                             handleErrorLog(e.getMessage());//处理错误日志
@@ -2296,8 +2281,8 @@ public class FileDisplayTopBar {//图片预览顶部栏
                 } else {//否则
                     File target = new File(path);//根据路径创建文件
                     if (target.exists() && target.isDirectory()) {//如果文件存在且是文件夹
-                        DirectoryTree.setCurrentFileList(detectPictureFile(target.listFiles()));//设置图片文件列表为当前文件夹
-                        updateMainPanel(false);//通知更新图片预览面板
+                        DirectoryTree.setCurrentFileList(detectFile(target.listFiles()));//设置图片文件列表为当前文件夹
+                        updateFileDisplayMainPanel(false);//通知更新图片预览面板
                         directoryManipulationButtonEnableJudgement();//按钮判断
                     } else {//否则
                         createBottomTipWindow(Main.SettingState.systemLanguage ? "Nonexistent Path" : "路径不存在");//提示
@@ -2317,7 +2302,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         } else {//否则
                             try {
                                 DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
-                                updateMainPanel(false);//通知更新图片预览面板
+                                updateFileDisplayMainPanel(false);//通知更新图片预览面板
                                 directoryManipulationButtonEnableJudgement();//按钮判断
                             } catch (IOException ex) {
                                 handleErrorLog(ex.getMessage());//处理错误日志
@@ -2327,13 +2312,13 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     } else {//否则
                         File target = new File(path);//根据路径创建文件
                         if (target.exists() && target.isDirectory()) {//如果文件存在且是文件夹
-                            DirectoryTree.setCurrentFileList(detectPictureFile(target.listFiles()));//设置图片文件列表为当前文件夹
+                            DirectoryTree.setCurrentFileList(detectFile(target.listFiles()));//设置图片文件列表为当前文件夹
                         } else {//否则
                             createBottomTipWindow(Main.SettingState.systemLanguage ? "Nonexistent Path" : "路径不存在");//提示
                             directoryTextField.setText(currentFolder);//恢复当前路径
-                            DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                            DirectoryTree.setCurrentFileList(detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                         }
-                        updateMainPanel(false);//通知更新图片预览面板
+                        updateFileDisplayMainPanel(false);//通知更新图片预览面板
                         directoryManipulationButtonEnableJudgement();//按钮判断
                     }
                 }
@@ -2348,7 +2333,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             directoryTextField.setText(currentFolder);//恢复当前路径
                             try {
                                 DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
-                                updateMainPanel(false);//通知更新图片预览面板
+                                updateFileDisplayMainPanel(false);//通知更新图片预览面板
                                 directoryManipulationButtonEnableJudgement();//按钮判断
                             } catch (IOException ex) {
                                 handleErrorLog(ex.getMessage());//处理错误日志
@@ -2356,12 +2341,12 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             }
                         } else {//否则
                             directoryTextField.setText(currentFolder);//恢复当前路径
-                            DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
-                            updateMainPanel(false);//通知更新图片预览面板
+                            DirectoryTree.setCurrentFileList(detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                            updateFileDisplayMainPanel(false);//通知更新图片预览面板
                             directoryManipulationButtonEnableJudgement();//按钮判断
                         }
                     }
-                    fileDisplayMainPanel.requestFocusInWindow();//焦点返回主面板
+                    mainPanel.requestFocusInWindow();//焦点返回主面板
                     e.consume();//阻止默认行为
                 }
             }
@@ -2397,9 +2382,9 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         throw new RuntimeException(e);//捕获异常
                     }
                 } else {//否则
-                    DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                    DirectoryTree.setCurrentFileList(detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                 }
-                updateMainPanel(false);//通知更新图片预览面板
+                updateFileDisplayMainPanel(false);//通知更新图片预览面板
                 directoryManipulationButtonEnableJudgement();//按钮判断
             }
         });
@@ -2453,7 +2438,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     performSearch();//进行搜索
                     e.consume();//阻止默认行为
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {//如果按下ESC
-                    fileDisplayMainPanel.requestFocusInWindow();//焦点返回主面板
+                    mainPanel.requestFocusInWindow();//焦点返回主面板
                     e.consume();//阻止默认行为
                 }
             }
@@ -2520,7 +2505,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                 } else {//否则
                     DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                 }
-                updateMainPanel(false);//通知更新
+                updateFileDisplayMainPanel(false);//通知更新
             } else {//否则
                 if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
                     File currentDir = new File(spikeVisionCloudPath + "/.buffer");//实时获取当前目录文件
@@ -2545,8 +2530,8 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     }
                 } else {//否则
                     DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
-                    updateMainPanel(false);//通知更新
-                    File[] allFiles = pictureFileList;//获取当前文件夹下所有图片文件
+                    updateFileDisplayMainPanel(false);//通知更新
+                    File[] allFiles = FileDisplayMainPanel.currentFileList;//获取当前文件夹下所有图片文件
                     if (allFiles != null) {//如果文件列表非空
                         List<File> result;//搜索结果文件列表
                         String[] keywords = keyword.split("\\s+");//把所有空格分割的关键字分割，获取关键字字符串数组
@@ -2561,7 +2546,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         DirectoryTree.setCurrentFileList(result.toArray(new File[0]));//通过结果列表更新图片文件列表
                     }
                 }
-                updateMainPanel(false);//通知更新
+                updateFileDisplayMainPanel(false);//通知更新
             }
         }
     }

@@ -69,7 +69,7 @@ public class FileEditScrollPane {//幻灯片滚动栏类
         scrollItemList.clear();//清空缩略图项目列表
         scrollPanePanel.removeAll();//清空图片面板
         for (FileDisplayMainPanel.ThumbnailItem originalItem : FileDisplayMainPanel.thumbnailItemList) {//遍历原始缩略图项目列表
-            ScrollItem copyItem = createScrollItem(originalItem.getFile(), originalItem.getFileImage(), originalItem.getFormat());//创建复制项目（因为javaswing的组件同时只能有一份实例，直接移动会清空原组件，必须复制）
+            ScrollItem copyItem = createScrollItem(originalItem.getFile(), originalItem.getFileImage());//创建复制项目（因为javaswing的组件同时只能有一份实例，直接移动会清空原组件，必须复制）
             copyItem.addMouseListener(new MouseAdapter() {//为复制项目添加鼠标监听
                 @Override
                 public void mouseClicked(MouseEvent e) {//如果鼠标点击
@@ -82,13 +82,13 @@ public class FileEditScrollPane {//幻灯片滚动栏类
         }
     }
 
-    private static ScrollItem createScrollItem(File file, BufferedImage bufferedImage, String format) {//创建滚动栏项目
+    private static ScrollItem createScrollItem(File file, BufferedImage bufferedImage) {//创建滚动栏项目
         double ratio = (double) SCROLL_PANE_IMAGE_HEIGHT / bufferedImage.getHeight();//计算缩略图缩放
         BufferedImage scaled = new BufferedImage((int) (bufferedImage.getWidth() * ratio), (int) (bufferedImage.getHeight() * ratio), BufferedImage.TYPE_INT_RGB);//生成高质量缩略图
         Graphics2D g2d = scaled.createGraphics();//创建高质量缩放图像
         g2d.drawImage(bufferedImage, 0, 0, scaled.getWidth(), scaled.getHeight(), null);//绘制图像
         g2d.dispose();//释放
-        return new ScrollItem(file, scaled, format);//返回项目
+        return new ScrollItem(file, scaled);//返回项目
     }
 
     public static void scrollToVisible() {//滚动到可视
@@ -114,13 +114,11 @@ public class FileEditScrollPane {//幻灯片滚动栏类
     public static class ScrollItem extends JComponent {//自定义滚动栏项目类（继承JComponent）
         private final File file;//文件
         private BufferedImage fileImage;//文件图像
-        private final String format;//格式
         private final transient Timer hoverTipTimer;//瞬态鼠标悬浮时间计数器
 
-        public ScrollItem(File file, BufferedImage fileImage, String format) {//构造方法：幻灯片滚动栏创建缩略图项目
+        public ScrollItem(File file, BufferedImage fileImage) {//构造方法：幻灯片滚动栏创建缩略图项目
             this.file = file;
             this.fileImage = fileImage;
-            this.format = format;
             hoverTipTimer = new Timer(1000, _ -> showItemHoverTipWindow());//初始化悬停计时器，设置1秒后就传递鼠标事件，展示提示信息
             hoverTipTimer.setRepeats(false);//设置计时器不重复
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));//设置鼠标为手指，提升交互体验
@@ -194,7 +192,6 @@ public class FileEditScrollPane {//幻灯片滚动栏类
                 JPanel content = new JPanel(new GridLayout(6, 1));//设置网格布局为6行1列
                 content.setBackground(new Color(250, 250, 250));//设置背景颜色
                 content.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(5, 5, 5, 5)));//用边框可以不用把文字设置到组件中心也能让文字左右隔出距离
-                content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Picture Type: " : "图片类型: ") + format));//图片格式
                 try {
                     content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Create Date: " : "创建时间：") + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Files.readAttributes(file.toPath(), BasicFileAttributes.class).creationTime().toMillis())));//图片创建时间
                     content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Modify Date: " : "修改时间：") + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(file.lastModified()))));//图片修改时间

@@ -1,7 +1,6 @@
 package FileDisplayPackage;
 
 import MainPackage.Main;
-import MainPackage.Setting;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 import static DirectoryPackage.DirectoryTree.createBottomTipWindow;
 import static MainPackage.Main.spikeVisionCloudPath;
@@ -27,7 +25,7 @@ import static FileDisplayPackage.FileDisplayBottomBar.undoStack;
 import static FileDisplayPackage.FileDisplayMainPanel.*;
 import static FileDisplayPackage.FileDisplayTopBar.*;
 
-public class FileDisplayPopupMenu {//图片预览右键弹出菜单
+public class FileDisplayPopupMenu {//文件展示右键弹出菜单
     public static JPopupMenu rightMousePopupMenu = new JPopupMenu();//鼠标右键弹出菜单
     public static JMenuItem cutButton = new JMenuItem(Main.SettingState.systemLanguage ? "Cut (Ctrl + X)" : "剪切（Ctrl + X）");//剪切按钮（有选中图片时有效）
     public static JMenuItem copyButton = new JMenuItem(Main.SettingState.systemLanguage ? "Copy (Ctrl + C)" : "复制（Ctrl + C）");//复制按钮（有选中图片时有效）
@@ -143,7 +141,7 @@ public class FileDisplayPopupMenu {//图片预览右键弹出菜单
     public static void handleEmptyRecycleBin() {//处理清空图片回收站
         Path recycleBinPath = Path.of(String.valueOf(spikeVisionCloudPath), ".appRecycleBin");//获取自定义回收站路径
         if (Files.exists(recycleBinPath)) {//如果存在自定义回收站路径
-            int confirm = JOptionPane.showConfirmDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Are You Sure To Empty Picture Recycle Bin? You Cannot Undo This Operation" : "确定要清空图片回收站吗？这个操作无法撤销", Main.SettingState.systemLanguage ? "Empty Confirm" : "确认清空", JOptionPane.YES_NO_OPTION);//创建确认信息
+            int confirm = JOptionPane.showConfirmDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Are You Sure To Empty Picture Recycle Bin? You Cannot Undo This Operation" : "确定要清空图片回收站吗？这个操作无法撤销", Main.SettingState.systemLanguage ? "Empty Confirm" : "确认清空", JOptionPane.YES_NO_OPTION);//创建确认信息
             if (confirm == JOptionPane.YES_OPTION) {//如果确认
                 File[] recycleBinFileList = new File(String.valueOf(recycleBinPath)).listFiles();//获取回收站内图片
                 if (recycleBinFileList != null) {//如果非空

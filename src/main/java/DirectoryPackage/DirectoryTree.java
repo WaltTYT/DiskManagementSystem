@@ -22,8 +22,17 @@ import java.util.Objects;
 import static FileDisplayPackage.FileDisplayMainPanel.*;
 import static FileDisplayPackage.FileDisplayTopBar.*;
 import static MainPackage.Setting.*;
-import static MainPackage.ThemeColor.DARK_DIRECTORY_MAIN_COLOR;
-import static MainPackage.ThemeColor.LIGHT_DIRECTORY_MAIN_COLOR;
+import static MainPackage.ThemeColor.*;
+import static MainPackage.ThemeColor.DARK_DIRECTORY_BACKGROUND_NON_SELECTION_COLOR;
+import static MainPackage.ThemeColor.DARK_DIRECTORY_BACKGROUND_SELECTION_COLOR;
+import static MainPackage.ThemeColor.DARK_DIRECTORY_BORDER_SELECTION_COLOR;
+import static MainPackage.ThemeColor.DARK_DIRECTORY_TEXT_NON_SELECTION_COLOR;
+import static MainPackage.ThemeColor.DARK_DIRECTORY_TEXT_SELECTION_COLOR;
+import static MainPackage.ThemeColor.LIGHT_DIRECTORY_BACKGROUND_NON_SELECTION_COLOR;
+import static MainPackage.ThemeColor.LIGHT_DIRECTORY_BACKGROUND_SELECTION_COLOR;
+import static MainPackage.ThemeColor.LIGHT_DIRECTORY_BORDER_SELECTION_COLOR;
+import static MainPackage.ThemeColor.LIGHT_DIRECTORY_TEXT_NON_SELECTION_COLOR;
+import static MainPackage.ThemeColor.LIGHT_DIRECTORY_TEXT_SELECTION_COLOR;
 import static NetworkPackage.User.*;
 
 public class DirectoryTree {//目录树类：采用懒加载方式，即只有打开文件夹时才对目录进行加载，极大优化程序
@@ -80,11 +89,11 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
                 Object nodeObject = selectedNode.getUserObject();//获取结点对象
                 if (nodeObject instanceof File selectedFile) {//如果结点对象是文件
                     if (!Objects.equals(currentFolder, selectedFile.getPath())) {//如果结点变化
-                        currentFileList = detectPictureFile(selectedFile.listFiles());//更新文件列表
+                        currentFileList = detectFile(selectedFile.listFiles());//更新文件列表
                         String currentFolder = selectedFile.getPath();//获取当前文件夹
                         FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
                         FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径文本
-                        FileDisplayMainPanel.updateMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
+                        FileDisplayMainPanel.updateFileDisplayMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
                         directoryManipulationButtonEnableJudgement();//按钮判断
                     }
                 } else if (nodeObject instanceof String && nodeObject.equals(Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
@@ -98,7 +107,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
                         String currentFolder = Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘";//获取当前文件夹
                         FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
                         FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径
-                        FileDisplayMainPanel.updateMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
+                        FileDisplayMainPanel.updateFileDisplayMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
                         directoryManipulationButtonEnableJudgement();//按钮判断
                     }
                 }//如果是根结点则不处理
@@ -160,7 +169,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
                 itemHoverTipWindow.dispose();//释放提示信息
                 itemHoverTipWindow = null;//提示信息置空
             }
-            fileDisplayMainPanel.removeAll();//清空
+            mainPanel.removeAll();//清空
             refreshMainPanel();//刷新
             directoryTree.setSelectionPath(directoryTree.getPathForRow(0));//选中节点
         }
@@ -183,7 +192,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
     }
 
     public static void updateCurrentFileList(File[] fileList) {//更新当前文件列表
-        DirectoryTree.currentFileList = detectPictureFile(fileList);//获取文件后赋值给当前文件数组
+        DirectoryTree.currentFileList = detectFile(fileList);//获取文件后赋值给当前文件数组
     }
 
     private static void configureTreeComponents(DefaultMutableTreeNode rootNode) {//配置树组件属性
@@ -260,11 +269,12 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
             } else if (userObject instanceof File) { //如果是盘符根目录或普通文件目录
                 handleFileNodeRendering((File) userObject);//对盘符根目录或普通文件目录进行渲染
             }
-            setBackgroundSelectionColor(new Color(225, 225, 225, 100));//设置选择背景颜色
-            setBackgroundNonSelectionColor(null);//设置未选择背景颜色
-            setTextSelectionColor(Color.black);//设置选择文字颜色
-            setTextNonSelectionColor(Color.black);//设置未选择文字颜色
-            setBorderSelectionColor(null);//设置选择边框颜色
+            setForeground(Main.SettingState.themeColor ? DARK_DIRECTORY_TEXT_NON_SELECTION_COLOR : LIGHT_DIRECTORY_TEXT_NON_SELECTION_COLOR);
+            setBackgroundSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_BACKGROUND_SELECTION_COLOR : LIGHT_DIRECTORY_BACKGROUND_SELECTION_COLOR);//设置选择背景颜色
+            setBackgroundNonSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_BACKGROUND_NON_SELECTION_COLOR : LIGHT_DIRECTORY_BACKGROUND_NON_SELECTION_COLOR);//设置未选择背景颜色
+            setTextSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_TEXT_SELECTION_COLOR : LIGHT_DIRECTORY_TEXT_SELECTION_COLOR);//设置选择文字颜色
+            setTextNonSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_TEXT_NON_SELECTION_COLOR : LIGHT_DIRECTORY_TEXT_NON_SELECTION_COLOR);//设置未选择文字颜色
+            setBorderSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_BORDER_SELECTION_COLOR : LIGHT_DIRECTORY_BORDER_SELECTION_COLOR);//设置选择边框颜色
             return this;//返回自身
         }
 
@@ -318,11 +328,11 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
     public static class Placeholder {//占位符标识类（用于触发懒加载）
     }//如果没有占位符，所有未打开的结点会变成叶子结点，会陷入只有双击打开结点才能将结点变成非叶子结点，但结点是叶子结点无法打开的逻辑闭环，所以一开始要往结点添加占位符使得结点是非叶子结点，可以打开，打开后再把占位符删除
 
-    public static File[] detectPictureFile(File[] fileList) {//检查图片文件：获取传入文件列表中的图片文件，并返回图片文件列表
+    public static File[] detectFile(File[] fileList) {//检查文件：获取传入文件列表中的文件，并返回列表
         if (fileList == null) return new File[0];//为空直接返回
         ArrayList<File> pictureList = new ArrayList<>();//创建一个集合列表用于返回
         for (File file : fileList) {//遍历列表
-            if (file == null || !file.isFile()) {//如果文件为空或文件不是文件就continue
+            if (file == null) {//如果文件为空就continue
                 continue;
             }
             pictureList.add(file);//否则就往集合列表中添加该文件
@@ -359,7 +369,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
             } else if (userDialog.isVisible()) {//如果用户窗口可见
                 bottomTipWindow = new JWindow(userDialog);//创建提示窗口（设置父组件防止覆盖）
             } else {//否则
-                bottomTipWindow = new JWindow(Main.pictureManagementSystemFrame);//创建提示窗口（设置父组件防止覆盖）
+                bottomTipWindow = new JWindow(Main.diskManagementSystemFrame);//创建提示窗口（设置父组件防止覆盖）
             }
         }
 

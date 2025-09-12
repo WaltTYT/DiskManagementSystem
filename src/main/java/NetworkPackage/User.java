@@ -34,13 +34,13 @@ import static FileDisplayPackage.FileDisplayTopBar.*;
 import static java.awt.Font.PLAIN;
 
 public class User {//用户类
-    public static JDialog userDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "User" : "用户", true);//用户对话窗口
-    public static JDialog logInDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Log In" : "登录", true);//登录对话窗口
-    public static JDialog registerDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Register" : "注册", true);//注册对话窗口
-    public static JDialog changeUserAccountDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Account" : "修改用户名", true);//修改用户名对话窗口
-    public static JDialog changeUserPhoneDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Phone Number" : "修改手机号", true);//修改用户手机号对话窗口
-    public static JDialog changeUserPasswordDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Password" : "修改密码", true);//修改用户密码对话窗口
-    public static JDialog logOutDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Log Out" : "注销", true);//注销对话窗口
+    public static JDialog userDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "User" : "用户", true);//用户对话窗口
+    public static JDialog logInDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Log In" : "登录", true);//登录对话窗口
+    public static JDialog registerDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Register" : "注册", true);//注册对话窗口
+    public static JDialog changeUserAccountDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Account" : "修改用户名", true);//修改用户名对话窗口
+    public static JDialog changeUserPhoneDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Phone Number" : "修改手机号", true);//修改用户手机号对话窗口
+    public static JDialog changeUserPasswordDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Password" : "修改密码", true);//修改用户密码对话窗口
+    public static JDialog logOutDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Log Out" : "注销", true);//注销对话窗口
 
     private static final JPanel userInformationPanel = new JPanel(new BorderLayout());//用户信息面板
     private static String userPhone = "";//用户手机号
@@ -408,11 +408,6 @@ public class User {//用户类
         dos.writeBoolean(Main.SettingState.pictureSuffix);//输出
         dos.writeBoolean(Main.SettingState.renameStrategy);//输出
         dos.writeBoolean(Main.SettingState.searchStrategy);//输出
-        dos.writeBoolean(Main.SettingState.GPUAcceleration);//输出
-        dos.writeInt(Main.SettingState.customGIFFrameAmount);//输出
-        dos.writeBoolean(Main.SettingState.GIFStrategy);//输出
-        dos.writeInt(Main.SettingState.customCacheRemainAmount);//输出
-        dos.writeBoolean(Main.SettingState.cacheStrategy);//输出
         dos.writeInt(Main.SettingState.customRecycleCleanTime);//输出
         dos.writeBoolean(Main.SettingState.recycleStrategy);//输出
         dos.writeInt(Main.SettingState.masterVolume);//输出
@@ -457,11 +452,6 @@ public class User {//用户类
         Main.SettingState.pictureSuffix = dis.readBoolean();//补全
         Main.SettingState.renameStrategy = dis.readBoolean();//补全
         Main.SettingState.searchStrategy = dis.readBoolean();//补全
-        Main.SettingState.GPUAcceleration = dis.readBoolean();//补全
-        Main.SettingState.customGIFFrameAmount = dis.readInt();//补全
-        Main.SettingState.GIFStrategy = dis.readBoolean();//补全
-        Main.SettingState.customCacheRemainAmount = dis.readInt();//补全
-        Main.SettingState.cacheStrategy = dis.readBoolean();//补全
         Main.SettingState.customRecycleCleanTime = dis.readInt();//补全
         Main.SettingState.recycleStrategy = dis.readBoolean();//补全
         Main.SettingState.masterVolume = dis.readInt();//补全
@@ -487,22 +477,6 @@ public class User {//用户类
         }
         switchBGM();//切换BGM
 
-        if (Main.SettingState.GPUAcceleration) {//如果开启GPU加速
-            System.setProperty("sun.java2d.opengl", "true");//使用openGL加速
-            System.setProperty("sun.java2d.d3d", "true");//使用Direct3D加速
-            System.setProperty("sun.java2d.renderer", "sun.java2d.marlin.MarlinRenderingEngine");//使用Marlin渲染器
-        }
-
-        if (Main.SettingState.GIFStrategy) {//如果完整播放
-            MAX_GIF_FRAME_AMOUNT = 10000;//设置为无穷
-        } else {//否则
-            MAX_GIF_FRAME_AMOUNT = Main.SettingState.customGIFFrameAmount;//设置为GIF帧数量
-        }
-        if (Main.SettingState.cacheStrategy) {//如果关闭清理
-            MAX_CACHE_REMAIN_AMOUNT = 1000000;//设置为无穷
-        } else {//否则
-            MAX_CACHE_REMAIN_AMOUNT = Main.SettingState.customCacheRemainAmount;//设置为缓存保留数量
-        }
         if (Main.SettingState.customRecycleCleanTime == 0 && !Main.SettingState.recycleStrategy) {//如果立即清理且没有关闭清理
             FileDisplayPopupMenu.handleAutoEmptyRecycleBin();//调用自动清空图片回收站
         }
@@ -826,11 +800,6 @@ public class User {//用户类
         dos.writeBoolean(Main.SettingState.pictureSuffix);//输出
         dos.writeBoolean(Main.SettingState.renameStrategy);//输出
         dos.writeBoolean(Main.SettingState.searchStrategy);//输出
-        dos.writeBoolean(Main.SettingState.GPUAcceleration);//输出
-        dos.writeInt(Main.SettingState.customGIFFrameAmount);//输出
-        dos.writeBoolean(Main.SettingState.GIFStrategy);//输出
-        dos.writeInt(Main.SettingState.customCacheRemainAmount);//输出
-        dos.writeBoolean(Main.SettingState.cacheStrategy);//输出
         dos.writeInt(Main.SettingState.customRecycleCleanTime);//输出
         dos.writeBoolean(Main.SettingState.recycleStrategy);//输出
         dos.writeInt(Main.SettingState.masterVolume);//输出
@@ -1103,7 +1072,7 @@ public class User {//用户类
         userInformationManipulationPanel.add(exitLogInButton);
         userInformationManipulationPanel.add(logOutButton);
 
-        userDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "User" : "用户", true);//创建用户对话窗口
+        userDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "User" : "用户", true);//创建用户对话窗口
         userDialog.setIconImage(new ImageIcon("src/material/image/dialogUser.png").getImage());//设置图标
         userDialog.setLayout(new BorderLayout());//设置布局
         userDialog.add(userInformationPanel, BorderLayout.NORTH);//把用户信息面板添加到北部
@@ -1322,7 +1291,7 @@ public class User {//用户类
         contentPanel.add(userAccountTextField);
         contentPanel.add(confirmChangeAccountButton);
 
-        changeUserAccountDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Account" : "修改用户名", true);//创建修改用户名对话窗口
+        changeUserAccountDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Account" : "修改用户名", true);//创建修改用户名对话窗口
         changeUserAccountDialog.setIconImage(new ImageIcon("src/material/image/dialogChangeUser.png").getImage());//设置图标
         changeUserAccountDialog.setLayout(new BorderLayout());//设置布局
         changeUserAccountDialog.add(contentPanel, BorderLayout.CENTER);//内容面板添加到中心
@@ -1665,7 +1634,7 @@ public class User {//用户类
         contentPanel.add(userVerificationTextField);
         contentPanel.add(confirmChangePhoneButton);
 
-        changeUserPhoneDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Phone Number" : "修改手机号", true);//创建修改用户手机号对话窗口
+        changeUserPhoneDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Phone Number" : "修改手机号", true);//创建修改用户手机号对话窗口
         changeUserPhoneDialog.setIconImage(new ImageIcon("src/material/image/dialogChangeUser.png").getImage());//设置图标
         changeUserPhoneDialog.setLayout(new BorderLayout());//设置布局
         changeUserPhoneDialog.add(contentPanel, BorderLayout.CENTER);//内容面板添加到中心
@@ -1950,7 +1919,7 @@ public class User {//用户类
         contentPanel.add(userConfirmPasswordTextField);
         contentPanel.add(confirmChangePasswordButton);
 
-        changeUserPasswordDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Password" : "修改密码", true);//创建修改用户密码对话窗口
+        changeUserPasswordDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Change Password" : "修改密码", true);//创建修改用户密码对话窗口
         changeUserPasswordDialog.setIconImage(new ImageIcon("src/material/image/dialogChangeUser.png").getImage());//设置图标
         changeUserPasswordDialog.setLayout(new BorderLayout());//设置布局
         changeUserPasswordDialog.add(contentPanel, BorderLayout.CENTER);//内容面板添加到中心
@@ -2114,7 +2083,7 @@ public class User {//用户类
         contentPanel.add(userPasswordTextField);
         contentPanel.add(confirmLogOutButton);
 
-        logOutDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Log Out" : "注销", true);//创建注销对话窗口
+        logOutDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Log Out" : "注销", true);//创建注销对话窗口
         logOutDialog.setIconImage(new ImageIcon("src/material/image/dialogLogOut.png").getImage());//设置图标
         logOutDialog.setLayout(new BorderLayout());//设置布局
         logOutDialog.add(contentPanel, BorderLayout.CENTER);//内容面板添加到中心
@@ -2712,7 +2681,7 @@ public class User {//用户类
         registerTipPanel.setBackground(Main.SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
         registerTipPanel.add(registerTipLabel);
 
-        logInDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Log In" : "登录", true);//创建登录对话窗口
+        logInDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Log In" : "登录", true);//创建登录对话窗口
         logInDialog.setIconImage(new ImageIcon("src/material/image/dialogRegister.png").getImage());//设置图标
         logInDialog.setLayout(new BorderLayout());//设置布局
         logInDialog.add(topPanel, BorderLayout.NORTH);//把顶部面板添加到北部
@@ -3436,7 +3405,7 @@ public class User {//用户类
         logInTipPanel.setBackground(Main.SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
         logInTipPanel.add(logInTipLabel);
 
-        registerDialog = new JDialog(Main.pictureManagementSystemFrame, Main.SettingState.systemLanguage ? "Register" : "注册", true);//创建注册对话窗口
+        registerDialog = new JDialog(Main.diskManagementSystemFrame, Main.SettingState.systemLanguage ? "Register" : "注册", true);//创建注册对话窗口
         registerDialog.setIconImage(new ImageIcon("src/material/image/dialogRegister.png").getImage());//设置图标
         registerDialog.setLayout(new BorderLayout());//设置布局
         registerDialog.add(registerTipPanel, BorderLayout.NORTH);//把注册提示标签添加到北部

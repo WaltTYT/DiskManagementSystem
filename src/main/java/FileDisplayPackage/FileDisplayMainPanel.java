@@ -8,13 +8,9 @@ import NetworkPackage.User;
 import com.ibm.icu.text.Collator;
 import com.ibm.icu.util.ULocale;
 import org.apache.commons.io.FilenameUtils;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -24,7 +20,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -34,7 +29,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import static DirectoryPackage.DirectoryTree.bottomTipLabel;
 import static DirectoryPackage.DirectoryTree.createBottomTipWindow;
@@ -48,7 +42,7 @@ import static NetworkPackage.User.handleUserSaveUserUploadPicture;
 import static java.awt.Font.PLAIN;
 import static java.awt.event.InputEvent.*;
 
-public class FileDisplayMainPanel {//图片预览主面板类
+public class FileDisplayMainPanel {//文件展示主面板类
     public static final int IMAGE_MAX_HEIGHT = 5000;//图片最大高度常量
     public static final int BORDER_THICKNESS = 2;//选中边框粗细常量
     public static final int MAX_HISTORY = 50;//堆栈最大历史长度常量
@@ -57,49 +51,39 @@ public class FileDisplayMainPanel {//图片预览主面板类
         ANAME, ADATE, ATYPE, ASIZE, DNAME, DDATE, DTYPE, DSIZE//0：名称排序（升序），1：日期排序（升序），2：类型排序（升序），3：大小排序（升序），4：名称排序（降序），5：日期排序（降序），6：类型排序（降序），7：大小排序（降序）
     }
 
-    public static JPanel fileDisplayMainPanel = null;//文件展示主面板：用于放置文件
+    public static JPanel mainPanel = null;//文件展示主面板：用于放置文件
     public static JLabel emptyLabel = new JLabel(Main.SettingState.systemLanguage ? "No File" : "暂无文件", SwingConstants.CENTER);//空状态提示标签：居中展示
     public static JWindow itemHoverTipWindow;//项目悬浮提示窗口
     public static JWindow draggedThumbnailItemWindow = null;//被拖拽缩略图项目窗口
     public static final JWindow progressWindow = new JWindow();//进度条窗口
     public static JProgressBar circularProgressBar;//后台工作圆形进度条
 
-    public static File[] pictureFileList = null;//图片文件数组
+    public static File[] currentFileList = null;//图片文件数组
     public static final List<ThumbnailItem> thumbnailItemList = new ArrayList<>();//缩略图项目列表
     public static final List<ThumbnailItem> selectionThumbnailItemList = new ArrayList<>();//选中缩略图项目列表
     private static final Set<String> sortRecallSelectedFilePaths = new HashSet<>();//保存选中文件路径，以便在更改排序方式后进行恢复
 
-    public static int imageWidth = 300;//图片宽度
+    public static int thumbnailItemWidth = 300;//缩略图宽度
     private static int totalFiles;//总共应处理文件数目
     private static int processedFiles;//已处理文件数目
     public static boolean loading = false;//图像是否在加载
     private static boolean dragging = false;//是否发生拖动（用于在鼠标松开时判断是否发生了拖动）
     public static int selectionAnchorIndex = -1;//锚点索引（用于保存选中项目，方便shift+点击进行调用）
-    private static double imageTotalKiloByte = 0.0;//该文件夹中图片总大小（因图片大小一般都有1KB，所以设置基本单位为1KB）
+    private static double fileTotalKiloByte = 0.0;//该文件夹中图片总大小（因图片大小一般都有1KB，所以设置基本单位为1KB）
     private static Point selectionStart;//鼠标框选起点
     private static final Rectangle selectionRect = new Rectangle();//鼠标框选矩形
     public static SortType currentSortType = SortType.ANAME;//当前排序方式，默认为名称排序
     private static final Collator CHINESE_COLLATOR = Collator.getInstance(ULocale.SIMPLIFIED_CHINESE);//使用Collator进行中文拼音排序比较
     public static ThumbnailItem draggedThumbnailItem = null;//被拖拽缩略图项目
     private static final Font thumbnailItemFont = new Font("楷体", PLAIN, 20);//缩略图项目字体常量
+    private static BufferedImage directoryIcon;//目录图标
+    private static BufferedImage textIcon;//文本图标
 
     public static SwingWorker<Void, ThumbnailItem> currentWorker;//后台工作任务引用
     public static final ExecutorService currentWorkerLoaderPool = Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() - 1));//创建有上限的全局线程池（限制最大并发数为系统可用线程-1（留下至少一个线程保证运行不卡顿），最少也需要四个线程）
-    public static int MAX_GIF_FRAME_AMOUNT;//设置最大GIF帧数量用于预览
-    public static int MAX_CACHE_REMAIN_AMOUNT;//设置最大缩略图缓存保留数量用于清理
-    public static final Map<String, SoftReference<BufferedImage>> thumbnailCache =//缩略图缓存：使用LRU缓存加软引用策略
-            new LinkedHashMap<>(MAX_CACHE_REMAIN_AMOUNT, 0.75f, true) {//设置哈希映射表最大容量为最大缓存容量
-                @Override
-                protected boolean removeEldestEntry(Map.Entry eldest) {//重新清除旧数据方法策略
-                    return size() > MAX_CACHE_REMAIN_AMOUNT;//当容量比最大缓存缩略图数量大时
-                }
-            };
     private static final Timer memoryMonitorTimer = new Timer(5000, _ -> {//内存监控计时器：每5s执行一次
         Runtime runtime = Runtime.getRuntime();//获取运行
         if (runtime.totalMemory() - runtime.freeMemory() > 2147483647) {//当内存超过2G时触发清理
-            if (!Main.SettingState.cacheStrategy) {//如果不清除缓存
-                thumbnailCache.clear();//清空缓存
-            }
             System.gc();//清除系统垃圾
         }
 
@@ -148,7 +132,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
         public void actionPerformed(ActionEvent evt) {//如果执行
             if (dragging) {//仅在拖动时滚动
                 try {
-                    JScrollPane scrollPane = (JScrollPane) fileDisplayMainPanel.getParent().getParent();//获取滚动条（注意mainPanel的父组件是视口，还要获得一次父组件才能获取滚动条）
+                    JScrollPane scrollPane = (JScrollPane) mainPanel.getParent().getParent();//获取滚动条（注意mainPanel的父组件是视口，还要获得一次父组件才能获取滚动条）
                     JViewport viewport = scrollPane.getViewport();//获取视口
                     JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();//获取垂直滚动框
                     Point mouseScreenPoint = MouseInfo.getPointerInfo().getLocation();//获取鼠标位置
@@ -191,16 +175,30 @@ public class FileDisplayMainPanel {//图片预览主面板类
         ImageIO.setUseCache(true);//使用ImageIO缓存加速读取
         ImageIO.setCacheDirectory(new File(System.getProperty("java.io.tmpdir")));//设置缓存路径
 
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> thumbnailCache.entrySet().removeIf(//添加定期清理线程
-                entry -> entry.getValue() == null), 5, 5, TimeUnit.MINUTES);//每5分钟为清理缓存中为空的键值对
-
         CHINESE_COLLATOR.setDecomposition(Collator.NO_DECOMPOSITION);//预加载排序数据
+
+        try (ImageInputStream directoryIconInput = ImageIO.createImageInputStream(new File("src/material/image/directoryIcon.png"))) {//生成目录图标
+            ImageReader reader = ImageIO.getImageReaders(directoryIconInput).next();//读取图像
+            reader.setInput(directoryIconInput);//设置读取出来的图像
+            directoryIcon = reader.read(0, reader.getDefaultReadParam());//获取原始图像
+        } catch (IOException e) {
+            handleErrorLog(e.getMessage());//处理错误日志
+            System.err.println("IOException: src/material/image/directoryIcon.png");//捕获异常
+        }
+        try (ImageInputStream textIconInput = ImageIO.createImageInputStream(new File("src/material/image/textIcon.png"))) {//生成文本图标
+            ImageReader reader = ImageIO.getImageReaders(textIconInput).next();//读取图像
+            reader.setInput(textIconInput);//设置读取出来的图像
+            textIcon = reader.read(0, reader.getDefaultReadParam());//获取原始图像
+        } catch (IOException e) {
+            handleErrorLog(e.getMessage());//处理错误日志
+            System.err.println("IOException: src/material/image/textIcon.png");//捕获异常
+        }
 
         memoryMonitorTimer.start();//开启内存监控计时器
     }
 
     public FileDisplayMainPanel() {//构造方法：初始化UI布局
-        fileDisplayMainPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 15, 15)) {//布局管理器为自动换行的流式布局（向左对齐），水平和垂直间隔为15
+        mainPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 15, 15)) {//布局管理器为自动换行的流式布局（向左对齐），水平和垂直间隔为15
             @Override
             protected void paintChildren(Graphics g) {//重写方法
                 super.paintChildren(g);//先绘制子组件（缩略图）
@@ -218,13 +216,13 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 }
             }
         };
-        fileDisplayMainPanel.setFocusable(true);//确保面板可获取焦点
-        fileDisplayMainPanel.requestFocusInWindow();//初始化后直接获取焦点
-        fileDisplayMainPanel.setDoubleBuffered(true);//使用双缓冲加速
-        fileDisplayMainPanel.setBackground(Main.SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景颜色
-        fileDisplayMainPanel.addMouseListener(new SelectionMouseAdapter());//主面板添加鼠标监听
-        fileDisplayMainPanel.addMouseMotionListener(new SelectionMouseAdapter());//主面板添加鼠标动作监听
-        fileDisplayMainPanel.addMouseWheelListener(new SelectionMouseAdapter());//主面板添加鼠标滚轮监听
+        mainPanel.setFocusable(true);//确保面板可获取焦点
+        mainPanel.requestFocusInWindow();//初始化后直接获取焦点
+        mainPanel.setDoubleBuffered(true);//使用双缓冲加速
+        mainPanel.setBackground(Main.SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景颜色
+        mainPanel.addMouseListener(new SelectionMouseAdapter());//主面板添加鼠标监听
+        mainPanel.addMouseMotionListener(new SelectionMouseAdapter());//主面板添加鼠标动作监听
+        mainPanel.addMouseWheelListener(new SelectionMouseAdapter());//主面板添加鼠标滚轮监听
 
         emptyLabel.setFont(new Font("微软雅黑", PLAIN, 25));//设置字体
         emptyLabel.setForeground(LIGHT_PICTURE_EMPTY_COLOR);//设置前景色
@@ -292,7 +290,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     private static void showEmptyState() {//显示空状态提示
-        fileDisplayMainPanel.add(emptyLabel, BorderLayout.CENTER);//添加空状态标签到主面板的中心区域
+        mainPanel.add(emptyLabel, BorderLayout.CENTER);//添加空状态标签到主面板的中心区域
         refreshMainPanel();//刷新
     }
 
@@ -311,8 +309,8 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     public static void initMainPanelShortcuts() {//启用主面板快捷键并设置键盘按键绑定
-        InputMap inputMap = fileDisplayMainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);//获取主面板输入映射，如果聚焦主面板则监听主面板的键盘输入
-        ActionMap actionMap = fileDisplayMainPanel.getActionMap();//获取主面板行动映射
+        InputMap inputMap = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);//获取主面板输入映射，如果聚焦主面板则监听主面板的键盘输入
+        ActionMap actionMap = mainPanel.getActionMap();//获取主面板行动映射
 
         bindKey(inputMap, actionMap, KeyEvent.VK_LEFT, ALT_DOWN_MASK, "retreat");//后退
         bindKey(inputMap, actionMap, KeyEvent.VK_RIGHT, ALT_DOWN_MASK, "advance");//前进
@@ -532,9 +530,9 @@ public class FileDisplayMainPanel {//图片预览主面板类
 
         @Override
         public void mouseClicked(MouseEvent e) {//如果鼠标点击
-            fileDisplayMainPanel.requestFocusInWindow();//确保主面板被点击时刷新键盘绑定
+            mainPanel.requestFocusInWindow();//确保主面板被点击时刷新键盘绑定
             if (SwingUtilities.isRightMouseButton(e)) {//如果是鼠标右键
-                FileDisplayPopupMenu.rightMousePopupMenu.show(Main.pictureManagementSystemFrame, e.getLocationOnScreen().x, e.getLocationOnScreen().y);//展示右键菜单
+                FileDisplayPopupMenu.rightMousePopupMenu.show(Main.diskManagementSystemFrame, e.getLocationOnScreen().x, e.getLocationOnScreen().y);//展示右键菜单
             }
         }
 
@@ -556,10 +554,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     int width = Math.abs(e.getX() - selectionStart.x);//获取宽度
                     int height = Math.abs(e.getY() - selectionStart.y);//获取高度
                     selectionRect.setBounds(x, y, width, height);//绘制框架：从左上角开始绘制宽为width高为height的矩形
-                    fileDisplayMainPanel.repaint();//触发重绘
+                    mainPanel.repaint();//触发重绘
 
                     try {
-                        JScrollPane scrollPane = (JScrollPane) fileDisplayMainPanel.getParent().getParent();//获取滚动条
+                        JScrollPane scrollPane = (JScrollPane) mainPanel.getParent().getParent();//获取滚动条
                         JViewport viewport = scrollPane.getViewport();//获取视口
                         Point mouseScreenPoint = e.getLocationOnScreen();//获取鼠标位置
                         Point viewportScreenPoint = viewport.getLocationOnScreen();//获取视口在屏幕的位置
@@ -591,7 +589,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 handleSelection(e);//就选中图片
                 selectionStart = null;//起点清空
                 selectionRect.setBounds(0, 0, 0, 0);//矩形清空
-                fileDisplayMainPanel.repaint();//触发重绘
+                mainPanel.repaint();//触发重绘
             }
         }
 
@@ -604,18 +602,18 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 }
                 handleZoom(e);//进行缩放处理
             } else {//否则进行滚动
-                fileDisplayMainPanel.getParent().dispatchEvent(e);//传递滚动事件给父容器
+                mainPanel.getParent().dispatchEvent(e);//传递滚动事件给父容器
             }
         }
 
         public static void handleZoom(MouseWheelEvent e) {//处理缩放
             e.consume();//消耗事件阻止事件继续传播
             int steps = e.getWheelRotation();//动态计算缩放步长
-            int baseStep = Math.max(50, imageWidth / 10);//基础步长
+            int baseStep = Math.max(50, thumbnailItemWidth / 10);//基础步长
             int delta = (int) (steps * baseStep * (e.getScrollAmount() / 2.0));//缩放倍率
-            int newWidth = Math.max(100, Math.min(750, imageWidth - delta));//限制缩放范围
-            if (newWidth != imageWidth) {//如果缩放发生更新
-                imageWidth = newWidth;//设置图片宽度为新宽度
+            int newWidth = Math.max(100, Math.min(750, thumbnailItemWidth - delta));//限制缩放范围
+            if (newWidth != thumbnailItemWidth) {//如果缩放发生更新
+                thumbnailItemWidth = newWidth;//设置图片宽度为新宽度
                 applyZoom();//应用缩放
             }
         }
@@ -632,9 +630,9 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 itemHoverTipWindow = null;//提示信息置空
             }
             loading = true;//开始加载
-            Main.pictureManagementSystemFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));//设置光标为等待
-            zoomSlider.setValue(imageWidth);//设置拖动条的值
-            JScrollPane scrollPane = (JScrollPane) fileDisplayMainPanel.getParent().getParent();//获取滚动条
+            Main.diskManagementSystemFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));//设置光标为等待
+            zoomSlider.setValue(thumbnailItemWidth);//设置拖动条的值
+            JScrollPane scrollPane = (JScrollPane) mainPanel.getParent().getParent();//获取滚动条
             JViewport viewport = scrollPane.getViewport();//获取视口
             Point originalPos = viewport.getViewPosition();//获取视口位置
             if (currentWorker != null && !currentWorker.isDone()) {//如果当前有工作
@@ -646,7 +644,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     ExecutorService executor = Executors.newFixedThreadPool(4);//创建有上限的线程池，限制线程并发数
                     List<Future<ThumbnailItem>> futures = new ArrayList<>();//未来工作列表
                     updateProgress(0);//初始化进度
-                    totalFiles = pictureFileList.length;//获取全部文件数量
+                    totalFiles = currentFileList.length;//获取全部文件数量
                     processedFiles = 0;//初始化已处理文件数量
                     for (ThumbnailItem item : thumbnailItemList) {//并行处理每个缩略图项
                         if (isCancelled()) {//如果工作取消
@@ -654,7 +652,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                         }
                         futures.add(executor.submit(() -> {//增加工作
                             processedFiles++;//已处理文件增加
-                            item.updateThumbnailItemSize(imageWidth);//更新缩略图尺寸
+                            item.updateThumbnailItemSize(thumbnailItemWidth, item.file);//更新缩略图尺寸
                             return item;//返回项目
                         }));//增加工作
                     }
@@ -680,7 +678,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 protected void done() {//完成时
                     refreshMainPanel();//刷新
                     viewport.setViewPosition(originalPos);//恢复滚动条位置
-                    Main.pictureManagementSystemFrame.setCursor(Cursor.getDefaultCursor());//设置光标为默认
+                    Main.diskManagementSystemFrame.setCursor(Cursor.getDefaultCursor());//设置光标为默认
                     loading = false;//加载结束
                 }
             };
@@ -726,10 +724,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
             sortRecallSelectedFilePaths.add(item.getFile().getAbsolutePath());//添加到排序选择文件路径回忆列表
         }
         currentSortType = type;//设置当前排序方式
-        updateMainPanel(false);//进行更新
+        updateFileDisplayMainPanel(false);//进行更新
     }
 
-    public static File[] pictureFileListSortProcess(File[] files) {//图片文件列表排序处理
+    public static File[] fileListSortProcess(File[] files) {//文件列表排序处理
         Arrays.sort(files, (f1, f2) -> {//进行排序
             try {
                 return switch (currentSortType) {//根据当前排序方式
@@ -749,7 +747,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 return 0;//捕获异常
             }
         });
-        return files;//返回图片文件列表
+        return files;//返回文件列表
     }
 
     private static int naturalCompareAlgorithm(String s1, String s2) {//自然排序算法
@@ -815,41 +813,36 @@ public class FileDisplayMainPanel {//图片预览主面板类
         return cmp != 0 ? cmp : Character.compare(c1, c2);//若忽略大小写后相等，则大写字母优先（和windows排序对齐）
     }
 
-    public static void updateMainPanel(boolean isPaste) {//更新主面板
+    public static void updateFileDisplayMainPanel(boolean isPaste) {//更新文件展示主面板
         if (currentWorker != null && !currentWorker.isDone()) {//如果当前有任务
             currentWorker.cancel(true);//则设置取消正在进行的加载任务：不取消，后面未加载的图片会进入新加载的文件夹中
         }
         loading = true;//图像正在加载
         slideButton.setEnabled(false);//幻灯片按钮无效
-        pictureFileList = DirectoryTree.getCurrentFileList();//获取图片文件列表
-        fileDisplayMainPanel.removeAll();//清空主面板
+        currentFileList = DirectoryTree.getCurrentFileList();//获取当前文件列表
+        mainPanel.removeAll();//清空主面板
         thumbnailItemList.clear();//清空缩略图项目列表
         selectionThumbnailItemList.clear();//清空选中缩略图项目列表
-        imageTotalKiloByte = 0;//清空图片总大小
-        for (Component comp : fileDisplayMainPanel.getComponents()) {//遍历所有组件
-            if (comp instanceof ThumbnailItem item) {//如果组件是缩略图项目类
-                item.stopGIFAnimation();//停止所有正在进行的动画
-            }
-        }
+        fileTotalKiloByte = 0;//清空图片总大小
         updateProgress(0);//初始化进度
 
-        if (pictureFileList != null && pictureFileList.length > 0) {//如果图片文件列表不为空
-            Main.pictureManagementSystemFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));//设置光标为等待
-            pictureFileList = pictureFileListSortProcess(pictureFileList);//排序处理
+        if (currentFileList != null && currentFileList.length > 0) {//如果当前文件列表不为空
+            Main.diskManagementSystemFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));//设置光标为等待
+            currentFileList = fileListSortProcess(currentFileList);//排序处理
             currentWorker = new SwingWorker<>() {//使用SwingWorker实现分块加载
                 private final ExecutorService threadPool = currentWorkerLoaderPool;//设置线程数控制并发数
 
                 @Override
                 protected Void doInBackground() {//在后台运行加载
                     processedFiles = 0;//初始化已处理文件数量
-                    totalFiles = pictureFileList.length;//获取全部文件数量
+                    totalFiles = currentFileList.length;//获取全部文件数量
                     List<Future<ThumbnailItem>> futures = new ArrayList<>();//未来任务列表
-                    for (File file : pictureFileList) {//遍历图像文件列表
+                    for (File file : currentFileList) {//遍历图像文件列表
                         if (isCancelled()) {//检测到取消任务
                             break;//直接退出
                         }
                         futures.add(threadPool.submit(() -> createThumbnailItem(file)));//增加任务
-                        imageTotalKiloByte += (double) file.length() / 1024;//图片总大小加上该图片大小（因返回的是字节，转化成KB需要除1024，且需要强制转换成double类型，否则计算不精确）
+                        fileTotalKiloByte += (double) file.length() / 1024;//文件总大小加上该图片大小（因返回的是字节，转化成KB需要除1024，且需要强制转换成double类型，否则计算不精确）
                     }
                     for (Future<ThumbnailItem> future : futures) {//超绝加速算法
                         if (isCancelled()) {//检测到取消任务
@@ -876,10 +869,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
                         }
                         thumbnailItemList.add(item);//向列表添加项目
                         processedFiles++;//已处理文件增加
-                        fileDisplayMainPanel.add(item);//向主面板中添加项目
+                        mainPanel.add(item);//向主面板中添加项目
                     }
-                    fileDisplayMainPanel.revalidate();//重新验证布局
-                    fileDisplayMainPanel.repaint();//重新绘制
+                    mainPanel.revalidate();//重新验证布局
+                    mainPanel.repaint();//重新绘制
                     updateProgress(100 * processedFiles / totalFiles);//更新进度条
                 }
 
@@ -908,11 +901,11 @@ public class FileDisplayMainPanel {//图片预览主面板类
                         updateBottomTipInformation();//更新提示信息
                     }
                     slideButton.setEnabled(true);//幻灯片按钮有效
-                    Main.pictureManagementSystemFrame.setCursor(Cursor.getDefaultCursor());//设置光标为默认
+                    Main.diskManagementSystemFrame.setCursor(Cursor.getDefaultCursor());//设置光标为默认
                     loading = false;//图像结束加载
                 }
             };
-            currentWorker.execute();//任务已经执行
+            currentWorker.execute();//任务执行
         } else {//否则
             showEmptyState();//显示空状态
             initBottomTipInformation();//初始化提示信息
@@ -920,14 +913,14 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     public static void initBottomTipInformation() {//初始化底部提示信息
-        if (pictureFileList != null && pictureFileList.length > 0) {//如果不为空
-            String information = pictureFileList.length + (Main.SettingState.systemLanguage ? " Pictures (" : "张图片（共");//显示共多少张图片
-            if (imageTotalKiloByte / 1048576 > 1.0) {//如果图片总大小在1GB以上
-                information += String.format("%.2f", imageTotalKiloByte / 1048576) + (Main.SettingState.systemLanguage ? "GB Totally) " : "GB）");//显示多少GB
-            } else if (imageTotalKiloByte / 1024 > 1.0) {//如果图片总大小在1MB以上
-                information += String.format("%.2f", imageTotalKiloByte / 1024) + (Main.SettingState.systemLanguage ? "MB Totally) " : "MB）");//显示多少MB
+        if (currentFileList != null && currentFileList.length > 0) {//如果不为空
+            String information = currentFileList.length + (Main.SettingState.systemLanguage ? " Items (" : "个项目（共");//显示共多少项目
+            if (fileTotalKiloByte / 1048576 > 1.0) {//如果文件总大小在1GB以上
+                information += String.format("%.2f", fileTotalKiloByte / 1048576) + (Main.SettingState.systemLanguage ? "GB Totally) " : "GB）");//显示多少GB
+            } else if (fileTotalKiloByte / 1024 > 1.0) {//如果文件总大小在1MB以上
+                information += String.format("%.2f", fileTotalKiloByte / 1024) + (Main.SettingState.systemLanguage ? "MB Totally) " : "MB）");//显示多少MB
             } else {//否则
-                information += String.format("%.2f", imageTotalKiloByte) + (Main.SettingState.systemLanguage ? "KB Totally) " : "KB）");//显示多少KB
+                information += String.format("%.2f", fileTotalKiloByte) + (Main.SettingState.systemLanguage ? "KB Totally) " : "KB）");//显示多少KB
             }
             Main.setBottomTipInformation(information);//将信息添加到主面板的信息区域中
         } else {//否则
@@ -937,23 +930,23 @@ public class FileDisplayMainPanel {//图片预览主面板类
 
     public static void updateBottomTipInformation() {//更新底部提示信息
         String information = Main.getBottomTipInformation().getText();//获取原先信息
-        if (selectionThumbnailItemList.isEmpty()) {//如果没有图片被选中
+        if (selectionThumbnailItemList.isEmpty()) {//如果没有文件被选中
             int endIndex = information.indexOf('-');//获取先前图片的选中信息位置
-            if (endIndex == -1) {//如果是没有图片选中时还是没有图片选中
+            if (endIndex == -1) {//如果是没有文件选中时还是没有文件选中
                 return;//不需要处理直接返回
             }//否则会越界
             Main.setBottomTipInformation(information.substring(0, endIndex));//重新获取提示信息并将信息更新到主面板的信息区域中
             return;//直接返回
         }
-        if (information.contains("-")) {//如果先前选中过图片
-            int endIndex = information.indexOf('-');//获取先前图片的选中信息位置
+        if (information.contains("-")) {//如果先前选中过文件
+            int endIndex = information.indexOf('-');//获取先前文件的选中信息位置
             information = information.substring(0, endIndex);//重新获取提示信息
         }
-        information += (Main.SettingState.systemLanguage ? "- Select " : "- 选中") + selectionThumbnailItemList.size() + (Main.SettingState.systemLanguage ? " Pictures (" : "张图片（共");//添加选中信息
+        information += (Main.SettingState.systemLanguage ? "- Select " : "- 选中") + selectionThumbnailItemList.size() + (Main.SettingState.systemLanguage ? " Items (" : "个项目（共");//添加选中信息
         double fileTotalSize = getSelectionThumbnailItemTotalSize();//获取选中图片总大小
-        if (fileTotalSize / 1048576 > 1.0) {//如果图片总大小在1GB以上
+        if (fileTotalSize / 1048576 > 1.0) {//如果文件总大小在1GB以上
             information += String.format("%.2f", fileTotalSize / 1048576) + (Main.SettingState.systemLanguage ? "GB Totally) " : "GB）");//显示多少GB
-        } else if (fileTotalSize / 1024 > 1.0) {//如果图片总大小在1MB以上
+        } else if (fileTotalSize / 1024 > 1.0) {//如果文件总大小在1MB以上
             information += String.format("%.2f", fileTotalSize / 1024) + (Main.SettingState.systemLanguage ? "MB Totally) " : "MB）");//显示多少MB
         } else {//否则
             information += String.format("%.2f", fileTotalSize) + (Main.SettingState.systemLanguage ? "KB Totally) " : "KB）");//显示多少KB
@@ -962,61 +955,49 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     public static double getSelectionThumbnailItemTotalSize() {//获取选中项目总大小
-        List<Integer> count = new ArrayList<>();//临时存储选中图片数目
-        for (int i = 0, j = 0; i < thumbnailItemList.size(); i++) {//遍历所有图片项目
+        List<Integer> count = new ArrayList<>();//临时存储选中文件数目
+        for (int i = 0, j = 0; i < thumbnailItemList.size(); i++) {//遍历所有文件项目
             if (j >= selectionThumbnailItemList.size()) {//如果越界
                 break;//直接退出
             }
-            if (thumbnailItemList.get(i) == selectionThumbnailItemList.get(j)) {//如果图片项目被选中
+            if (thumbnailItemList.get(i) == selectionThumbnailItemList.get(j)) {//如果文件项目被选中
                 count.add(i);//添加被选中项目
                 j++;//自增
             }
         }
         double fileTotalSize = 0.0;//选中项目总大小
         for (Integer integer : count) {//遍历被选中项目
-            fileTotalSize += (double) pictureFileList[integer].length() / 1024;//项目总大小增加
+            fileTotalSize += (double) currentFileList[integer].length() / 1024;//项目总大小增加
         }
         return fileTotalSize;//返回选中项目总大小
     }
 
     private static ThumbnailItem createThumbnailItem(File file) {//创建单个缩略图项目（创建完成返回缩略图项目类）
-        String cacheKey = file.getAbsolutePath() + "|" + imageWidth;//缓存地址
-        try (ImageInputStream input = ImageIO.createImageInputStream(file)) {//缓存未命中则生成缩略图
-            SwingUtilities.invokeLater(() -> updateProgress((int) (++processedFiles * 100.0 / totalFiles)));//在读取图片后发送进度更新
-            ImageReader reader = ImageIO.getImageReaders(input).next();//读取图像
-            String format = reader.getFormatName().toUpperCase();//获取图片格式
-
-            SoftReference<BufferedImage> cachedRef = thumbnailCache.get(cacheKey);//优先从缓存获取（使用软引用）
-            if (cachedRef != null) {//如果命中缓存
-                BufferedImage cached = cachedRef.get();//从缓存获取图像
-                ThumbnailItem item = new ThumbnailItem(file, cached, format);//通过缓存数据创建项目
-                handleThumbnailMouseEvent(item);//处理项目鼠标事件，缓存也需要添加事件监听
-                handleThumbnailKeyEvent(item);//处理项目键盘事件，缓存也需要添加键盘监听
-                return item;//直接返回
-            }
-
-            try {//否则创建图像
-                reader.setInput(input);//设置读取出来的图像
-                BufferedImage original = reader.read(0, reader.getDefaultReadParam());//获取原始图像
-                double ratio = Math.min((double) imageWidth / original.getWidth(), (double) IMAGE_MAX_HEIGHT / original.getHeight());//计算缩略图缩放
-                BufferedImage thumbnail = new BufferedImage((int) (original.getWidth() * ratio), (int) (original.getHeight() * ratio), BufferedImage.TYPE_INT_RGB);//生成高质量缩略图
-                Graphics2D g2d = thumbnail.createGraphics();//创建高质量缩放图像
-                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);//优先速度
-                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿设置
-                g2d.drawImage(original, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), null);//绘制图像
-                g2d.dispose();//释放
-                thumbnailCache.put(cacheKey, new SoftReference<>(thumbnail));//生成缩略图后存入缓存
-                ThumbnailItem item = new ThumbnailItem(file, thumbnail, format);//创建项目
-                handleThumbnailMouseEvent(item);//处理项目鼠标事件
-                handleThumbnailKeyEvent(item);//处理项目键盘事件
-                return item;//返回项目
-            } finally {//不管有无捕获异常都会执行除非JVM退出
-                reader.dispose();//释放资源
-            }
-        } catch (IOException e) {
-            handleErrorLog(e.getMessage());//处理错误日志
-            System.err.println("IOException:" + file.getName());//捕获异常
-            return null;//返回空
+        SwingUtilities.invokeLater(() -> updateProgress((int) (++processedFiles * 100.0 / totalFiles)));//在读取文件后发送进度更新
+        if (file.isDirectory()) {//如果是目录
+            double ratio = Math.min((double) thumbnailItemWidth / directoryIcon.getWidth(), (double) IMAGE_MAX_HEIGHT / directoryIcon.getHeight());//计算缩略图缩放
+            BufferedImage thumbnail = new BufferedImage((int) (directoryIcon.getWidth() * ratio), (int) (directoryIcon.getHeight() * ratio), BufferedImage.TYPE_INT_ARGB);//生成高质量缩略图
+            Graphics2D g2d = thumbnail.createGraphics();//创建高质量缩放图像
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);//优先速度
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿设置
+            g2d.drawImage(directoryIcon, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), null);//绘制图像
+            g2d.dispose();//释放
+            ThumbnailItem item = new ThumbnailItem(file, thumbnail);//创建项目
+            handleThumbnailMouseEvent(item);//处理项目鼠标事件
+            handleThumbnailKeyEvent(item);//处理项目键盘事件
+            return item;//返回项目
+        } else {//如果是流式文件
+            double ratio = Math.min((double) thumbnailItemWidth / textIcon.getWidth(), (double) IMAGE_MAX_HEIGHT / textIcon.getHeight());//计算缩略图缩放
+            BufferedImage thumbnail = new BufferedImage((int) (textIcon.getWidth() * ratio), (int) (textIcon.getHeight() * ratio), BufferedImage.TYPE_INT_ARGB);//生成高质量缩略图
+            Graphics2D g2d = thumbnail.createGraphics();//创建高质量缩放图像
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);//优先速度
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿设置
+            g2d.drawImage(textIcon, 0, 0, thumbnail.getWidth(), thumbnail.getHeight(), null);//绘制图像
+            g2d.dispose();//释放
+            ThumbnailItem item = new ThumbnailItem(file, thumbnail);//创建项目
+            handleThumbnailMouseEvent(item);//处理项目鼠标事件
+            handleThumbnailKeyEvent(item);//处理项目键盘事件
+            return item;//返回项目
         }
     }
 
@@ -1024,8 +1005,8 @@ public class FileDisplayMainPanel {//图片预览主面板类
         item.addMouseListener(new MouseAdapter() {//创建鼠标监听
             @Override
             public void mouseClicked(MouseEvent e) {//如果鼠标点击
-                if (!fileDisplayMainPanel.hasFocus()) {//如果只对项目进行点击时
-                    fileDisplayMainPanel.requestFocusInWindow();//主面板要获取焦点防止快捷键失效
+                if (!mainPanel.hasFocus()) {//如果只对项目进行点击时
+                    mainPanel.requestFocusInWindow();//主面板要获取焦点防止快捷键失效
                 }
                 if (SwingUtilities.isLeftMouseButton(e)) {//如果是鼠标左键
                     if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {//如果ctrl键被按下
@@ -1038,7 +1019,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     updateBottomTipInformation();//更新提示信息
                     FileDisplayTopBar.fileManipulationButtonEnableJudgement(selectionThumbnailItemList.size());//进行按钮判断
                 } else {//否则是鼠标右键
-                    FileDisplayPopupMenu.rightMousePopupMenu.show(Main.pictureManagementSystemFrame, e.getLocationOnScreen().x, e.getLocationOnScreen().y);//展示右键菜单
+                    FileDisplayPopupMenu.rightMousePopupMenu.show(Main.diskManagementSystemFrame, e.getLocationOnScreen().x, e.getLocationOnScreen().y);//展示右键菜单
                 }
             }
 
@@ -1056,10 +1037,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     if (DirectoryTree.currentNodeObject != null) {//如果当前结点对象非空
                         if (DirectoryTree.currentNodeObject instanceof File selectedFile) {//如果当前结点对象是文件
                             String currentFolder = selectedFile.getPath();//获取当前文件夹
-                            DirectoryTree.setCurrentFileList(DirectoryTree.detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                            DirectoryTree.setCurrentFileList(DirectoryTree.detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                             FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
                             FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径
-                            FileDisplayMainPanel.updateMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
+                            FileDisplayMainPanel.updateFileDisplayMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
                             directoryManipulationButtonEnableJudgement();//按钮判断
                             handlePaste();//处理粘贴
                         } else if (Objects.equals(DirectoryTree.currentNodeObject, (Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘"))) {//如果是云盘结点
@@ -1072,7 +1053,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                             }
                             FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
                             FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径
-                            FileDisplayMainPanel.updateMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
+                            FileDisplayMainPanel.updateFileDisplayMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
                             directoryManipulationButtonEnableJudgement();//按钮判断
                             handlePaste();//处理粘贴
                         }
@@ -1095,7 +1076,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     handleSelection(e);//就选中图片
                     selectionStart = null;//起点清空
                     selectionRect.setBounds(0, 0, 0, 0);//矩形清空
-                    fileDisplayMainPanel.repaint();//触发重绘
+                    mainPanel.repaint();//触发重绘
                     dragging = false;//清除拖动状态
                 }
             }
@@ -1153,10 +1134,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     int width = Math.abs(item.getX() + e.getX() - selectionStart.x);//获取宽度
                     int height = Math.abs(item.getY() + e.getY() - selectionStart.y);//获取高度
                     selectionRect.setBounds(x, y, width, height);//绘制框架：从左上角开始绘制宽为width高为height的矩形
-                    fileDisplayMainPanel.repaint();//触发重绘
+                    mainPanel.repaint();//触发重绘
 
                     try {
-                        JScrollPane scrollPane = (JScrollPane) fileDisplayMainPanel.getParent().getParent();//获取滚动条
+                        JScrollPane scrollPane = (JScrollPane) mainPanel.getParent().getParent();//获取滚动条
                         JViewport viewport = scrollPane.getViewport();//获取视口
                         Point mouseScreenPoint = e.getLocationOnScreen();//获取鼠标位置
                         Point viewportScreenPoint = viewport.getLocationOnScreen();//获取视口在屏幕的位置
@@ -1254,25 +1235,18 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     public static void refreshMainPanel() {//刷新主面板
-        fileDisplayMainPanel.revalidate();//重新验证
-        fileDisplayMainPanel.repaint();//重新绘制
+        mainPanel.revalidate();//重新验证
+        mainPanel.repaint();//重新绘制
     }
 
     public static class ThumbnailItem extends JComponent {//缩略图项目类（继承JComponent）
         private File file;//文件
         private String fileName;//文件名称
         private BufferedImage fileImage;//文件图像
-        private String format;//图像格式
         private List<String> textLines;//文件名称多行文本行（一个字符串列表，一个单位字符串代表一整行文本，实现对文件名称的分离）
         private transient int textHeight;//瞬态缓存字体高度
         private transient Timer hoverTipTimer;//瞬态鼠标悬浮时间计数器
         private final transient FontMetrics fontMetrics = getFontMetrics(thumbnailItemFont);//瞬态字体格式
-
-        private boolean isGIF = false;//文件是否是GIF
-        private int currentGIFFrame = 0;//当前帧数
-        private int[] frameDelays;//帧延迟数组（每个元素存储这一帧需要多少延迟）
-        private Timer GIFAnimationTimer;//GIF动画计时器
-        private List<BufferedImage> GIFFrames = new ArrayList<>();//GIF帧缓存图片列表
 
         public File getFile() {//获取文件
             return file;
@@ -1282,11 +1256,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
             return fileImage;
         }
 
-        public String getFormat() {//获取格式
-            return format;
-        }
-
-        public ThumbnailItem(File file, BufferedImage fileImage, String format) {//构造方法：正常创建缩略图项目
+        public ThumbnailItem(File file, BufferedImage fileImage) {//构造方法：正常创建缩略图项目
             this.file = file;
             this.fileName = file.getName();
             if (Main.SettingState.pictureSuffix) {//如果关闭图片后缀
@@ -1299,18 +1269,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 }
             }
             this.fileImage = fileImage;
-            this.format = format;
-            this.textLines = calculateTextLines(imageWidth - 10);//计算文本行
+            this.textLines = calculateTextLines(thumbnailItemWidth - 10);//计算文本行
             this.textHeight = textLines.size() * getFontMetrics(thumbnailItemFont).getHeight();//计算文本高度为文本行行数乘字体高度
             hoverTipTimer = new Timer(1000, _ -> showItemHoverTipWindow());//初始化悬停计时器，设置1秒后就传递鼠标事件，展示提示信息
             hoverTipTimer.setRepeats(false);//设置计时器不重复
-            if ("GIF".equals(format)) {//如果是GIF
-                this.isGIF = true;//GIF为真
-                loadGIFFrame(file);//加载GIF帧
-                if (!GIFFrames.isEmpty()) {//如果帧为空
-                    startGIFAnimation();//启动GIF动画
-                }
-            }
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));//设置鼠标为手指，提升交互体验
             setPreferredSize(new Dimension(fileImage.getWidth(), fileImage.getHeight() + textHeight));//设置组件大小（宽度和图片一致，高度为图片高度加上文本高度）
         }
@@ -1335,110 +1297,6 @@ public class FileDisplayMainPanel {//图片预览主面板类
             if (!currentLine.isEmpty()) lines.add(currentLine.toString());//如果最后一行还有内容，再添加到文本行中
             textHeight = lines.size() * fontMetrics.getHeight();//通过文本行大小乘上文本高度获取文本组件高度
             return lines;//返回临时文本行
-        }
-
-        private void loadGIFFrame(File GIFFile) {//加载GIF帧
-            try (ImageInputStream input = ImageIO.createImageInputStream(GIFFile)) {//读取GIF文件
-                Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("GIF");//创建GIF读入者
-                if (readers.hasNext()) {//如果读入者有当前元素
-                    ImageReader reader = readers.next();//获取元素
-                    reader.setInput(input);//设置输入为GIF文件
-                    int numFrames = Math.min(reader.getNumImages(true), MAX_GIF_FRAME_AMOUNT);//获取帧数量：仅加载前MAX_GIF_FRAME_AMOUNT帧
-                    GIFFrames = new ArrayList<>(numFrames);//通过帧数量创建总容量为帧数量的GIF图片帧列表
-                    frameDelays = new int[numFrames];//通过帧数量创建总容量为帧数量的帧延迟数组
-                    Map<String, Integer> disposalMethodMap = new HashMap<>();//创建处置方法映射表
-                    disposalMethodMap.put("none", 0);//当none时返回0
-                    disposalMethodMap.put("doNotDispose", 1);//当doNotDispose返回1
-                    disposalMethodMap.put("restoreToBackgroundColor", 2);//当restoreToBackgroundColor返回2
-                    disposalMethodMap.put("restoreToPrevious", 3);//当restoreToPrevious返回3
-                    int[] disposalMethods = new int[numFrames];//通过帧数创建处置方法数组
-                    BufferedImage canvas = null;//创建缓存图片画布
-
-                    for (int i = 0; i < numFrames; i++) {//遍历帧数
-                        IIOMetadata metadata = reader.getImageMetadata(i);//读取帧延迟时间元数据
-                        Node root = metadata.getAsTree("javax_imageio_gif_image_1.0");//将元数据以树形式创建根结点
-                        NodeList children = root.getChildNodes();//获取根结点的子结点列表
-                        int delayTime = 0;//初始延迟时间为0
-                        int disposalMethod = 0;//初始处置方法默认为0
-                        for (int j = 0; j < children.getLength(); j++) {//遍历子结点列表
-                            Node node = children.item(j);//获取当前子结点
-                            if (node.getNodeName().equals("GraphicControlExtension")) {//如果子结点的名称等于GraphicControlExtension
-                                NamedNodeMap attrs = node.getAttributes();//获取结点属性
-                                String disposalMethodStr = attrs.getNamedItem("disposalMethod").getNodeValue();//获取处置方法字符串
-                                delayTime = Integer.parseInt(attrs.getNamedItem("delayTime").getNodeValue());//获取处置时间
-                                disposalMethod = disposalMethodMap.getOrDefault(disposalMethodStr, 0);//获取处置方法
-                            }
-                        }
-                        BufferedImage frame = reader.read(i);//读取帧图像
-                        if (canvas == null) {//如果为空
-                            canvas = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_ARGB);//就创建画布图像
-                        }
-                        Graphics2D g2d = canvas.createGraphics();//创建工具类
-                        applyGIFDisposalMethod(g2d, disposalMethod, i, canvas);//应用处置方法
-                        g2d.drawImage(frame, 0, 0, null);//绘制图像
-                        g2d.dispose();//释放
-                        BufferedImage copy = new BufferedImage(imageWidth, fileImage.getHeight(), BufferedImage.TYPE_INT_ARGB);//保存合成后的帧
-                        Graphics2D copyG2d = copy.createGraphics();//创建保存工具类
-                        copyG2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿
-                        copyG2d.drawImage(canvas, 0, 0, imageWidth, fileImage.getHeight(), null);//绘制画布图像并绘制为基础宽度和计算后高度
-                        copyG2d.dispose();//释放
-                        GIFFrames.add(copy);//把帧图像添加到列表中
-                        frameDelays[i] = delayTime * 10;//将延迟转换为毫秒单位放入帧延迟数组
-                        disposalMethods[i] = disposalMethod;//处置方法数组i的位置设置处置方法
-                    }
-                    reader.dispose();//释放读入者
-                }
-            } catch (IOException | NumberFormatException e) {
-                handleErrorLog(e.getMessage());//处理错误日志
-                e.printStackTrace();//捕获异常
-                GIFFrames.clear();//清除帧列表
-            }
-        }
-
-        private void startGIFAnimation() {//启动GIF动画
-            if (GIFAnimationTimer == null && !GIFFrames.isEmpty()) {//如果计时器为空且帧列表不为空
-                GIFAnimationTimer = new Timer(frameDelays[0], _ -> {//开启计时器，第一次延迟为帧延迟列表的第一个元素
-                    Rectangle compBounds = getBounds();//获取组件在滚动面板中的可见性
-                    compBounds.setLocation(getLocation());//设置位置
-                    if (!isShowing() || !isVisible() || !fileDisplayMainPanel.getVisibleRect().intersects(compBounds)) {//可见性检测
-                        return;//如果不可见就返回
-                    }
-                    currentGIFFrame = (currentGIFFrame + 1) % Math.min(GIFFrames.size(), MAX_GIF_FRAME_AMOUNT + 1);//当前帧循环（在帧大小和最大帧数量取最小值后的范围内）
-                    if (currentGIFFrame < frameDelays.length) {//如果当前帧小于帧延迟的长度
-                        GIFAnimationTimer.setDelay(frameDelays[currentGIFFrame]);//设置计时器延迟为下一帧延迟
-                    }
-                    repaint();//重绘
-                });
-                GIFAnimationTimer.setInitialDelay(0);//设置计时器初始延迟为0
-                GIFAnimationTimer.start();//开启计时器
-            }
-        }
-
-        public void stopGIFAnimation() {//停止GIF动画并释放资源
-            if (GIFAnimationTimer != null) {//如果GIF动画计时器不为空
-                GIFAnimationTimer.stop();//停止GIF动画计时器
-                GIFAnimationTimer = null;//GIF动画计时器置空
-            }
-            if (!GIFFrames.isEmpty()) {//如果GIF帧列表不为空
-                GIFFrames.forEach(BufferedImage::flush);//就遍历每一帧进行清除
-                GIFFrames.clear();//再清空列表
-            }
-        }
-
-        private void applyGIFDisposalMethod(Graphics2D g2d, int method, int frameIndex, BufferedImage canvas) {//应用GIF处置方法
-            switch (method) {//根据处置方法选择
-                case 1://保持当前帧（不做处理）
-                    break;
-                case 2://恢复背景色
-                    g2d.setBackground(new Color(0, 0, 0, 0));//设置背景颜色透明
-                    g2d.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());//清除绘制
-                    break;
-                case 3://恢复前一帧
-                    if (frameIndex > 0) {//如果帧索引不为0
-                        g2d.drawImage(GIFFrames.get(frameIndex - 1), 0, 0, null);//就绘制上一帧
-                    }
-                    break;
-            }
         }
 
         private void showItemHoverTipWindow() {//显示提示信息
@@ -1466,10 +1324,9 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 itemHoverTipWindow.dispose();//关闭之前的提示信息窗口
             }
             if (file != null) {//如果不为空
-                JPanel content = new JPanel(new GridLayout(6, 1));//设置网格布局为6行1列
+                JPanel content = new JPanel(new GridLayout(4, 1));//设置网格布局为6行1列
                 content.setBackground(new Color(250, 250, 250));//设置背景颜色
                 content.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(5, 5, 5, 5)));//用边框可以不用把文字设置到组件中心也能让文字左右隔出距离
-                content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Picture Type: " : "图片类型: ") + format));//图片格式
                 try {
                     content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Create Date: " : "创建时间：") + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Files.readAttributes(file.toPath(), BasicFileAttributes.class).creationTime().toMillis())));//图片创建时间
                     content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Modify Date: " : "修改时间：") + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(file.lastModified()))));//图片修改时间
@@ -1478,17 +1335,8 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     handleErrorLog(e.getMessage());//处理错误日志
                     throw new RuntimeException(e);//捕获异常
                 }
-                try (ImageInputStream input = ImageIO.createImageInputStream(file)) {//根据文件创建图片输入流
-                    ImageReader reader = ImageIO.getImageReaders(input).next();//创建图片读入者读取图像
-                    reader.setInput(input);//设置读取出来的图像
-                    BufferedImage original = reader.read(0, reader.getDefaultReadParam());//获取原始图像
-                    content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Resolution: " : "分辨率: ") + original.getWidth() + "x" + original.getHeight()));//图片分辨率
-                } catch (IOException e) {
-                    handleErrorLog(e.getMessage());//处理错误日志
-                    throw new RuntimeException(e);//捕获异常
-                }
                 content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Size: " : "大小: ") + calculateItemHoverTipFileSize(file.length())));//图片大小
-                itemHoverTipWindow = new JWindow(Main.pictureManagementSystemFrame);//创建提示信息窗口
+                itemHoverTipWindow = new JWindow(Main.diskManagementSystemFrame);//创建提示信息窗口
                 itemHoverTipWindow.setContentPane(content);//放入内容
                 itemHoverTipWindow.pack();//合适
                 int x = mousePos.x;//x坐标
@@ -1512,54 +1360,31 @@ public class FileDisplayMainPanel {//图片预览主面板类
             return label;//返回面板
         }
 
-        public void updateThumbnailItemSize(int newWidth) {//更新缩略图尺寸
-            String cacheKey = file.getAbsolutePath() + "|" + newWidth;//获取缓存键值
-            SoftReference<BufferedImage> cachedRef = thumbnailCache.get(cacheKey);//优先从缓存获取（使用软引用）
-            if (cachedRef != null) {//如果命中缓存
-                BufferedImage cached = cachedRef.get();//获取缓存图像
-                this.fileImage = cached;//设置图像为缓存图像
-                if (cached != null) {//如果不为空
-                    updateImageSize(newWidth, cached.getHeight());//重新设置组件大小
-                }
-            } else {//否则
-                ImageReader reader = null;//读取图像
-                try (ImageInputStream input = ImageIO.createImageInputStream(file)) {//获取输入流
-                    reader = ImageIO.getImageReaders(input).next();//读取
-                    reader.setInput(input);//设置输入
-                    BufferedImage original = reader.read(0, reader.getDefaultReadParam());//创建原始图像
-                    double ratio = (double) newWidth / original.getWidth();//计算图像缩放比例
-                    int newHeight = (int) (original.getHeight() * ratio);//计算图像新高度
-                    BufferedImage thumbnail = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);//创建缩放图像
-                    Graphics2D g2d = thumbnail.createGraphics();//创建
-                    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿
-                    g2d.drawImage(original, 0, 0, newWidth, newHeight, null);//绘制图像
-                    g2d.dispose();//释放
-                    thumbnailCache.put(cacheKey, new SoftReference<>(thumbnail));//将拥有新宽度的缩略图图像存入缓存
-                    SwingUtilities.invokeLater(() -> {//推迟进行
-                        this.fileImage = thumbnail;//设置图像为新缩放图像
-                        updateImageSize(newWidth, newHeight);//更新图像大小
-                    });
-                } catch (IOException e) {
-                    handleErrorLog(e.getMessage());//处理错误日志
-                    e.printStackTrace();//捕获异常
-                } finally {//最终
-                    if (reader != null) {//如果读入者不为空
-                        reader.dispose();//释放
-                    }
-                }
-            }
-
-            if (isGIF) {//如果是GIF
-                GIFFrames.clear();//清空GIF帧
-                frameDelays = new int[0];//重置帧延迟数组
-                if (GIFAnimationTimer != null) {//如果计时器非空
-                    GIFAnimationTimer.stop();//停止计时器
-                    GIFAnimationTimer = null;//计时器置空
-                }
-                loadGIFFrame(file);//重新加载GIF帧
-                if (!GIFFrames.isEmpty()) {//如果帧非空
-                    startGIFAnimation();//重启GIF动画
-                }
+        public void updateThumbnailItemSize(int newWidth, File file) {//更新缩略图尺寸
+            if (file.isDirectory()) {//如果是目录
+                double ratio = (double) newWidth / directoryIcon.getWidth();//计算图像缩放比例
+                int newHeight = (int) (directoryIcon.getHeight() * ratio);//计算图像新高度
+                BufferedImage thumbnail = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);//创建缩放图像
+                Graphics2D g2d = thumbnail.createGraphics();//创建
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿
+                g2d.drawImage(directoryIcon, 0, 0, newWidth, newHeight, null);//绘制图像
+                g2d.dispose();//释放
+                SwingUtilities.invokeLater(() -> {//推迟进行
+                    this.fileImage = thumbnail;//设置图像为新缩放图像
+                    updateImageSize(newWidth, newHeight);//更新图像大小
+                });
+            } else {//否则是流式文件
+                double ratio = (double) newWidth / textIcon.getWidth();//计算图像缩放比例
+                int newHeight = (int) (textIcon.getHeight() * ratio);//计算图像新高度
+                BufferedImage thumbnail = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);//创建缩放图像
+                Graphics2D g2d = thumbnail.createGraphics();//创建
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿
+                g2d.drawImage(textIcon, 0, 0, newWidth, newHeight, null);//绘制图像
+                g2d.dispose();//释放
+                SwingUtilities.invokeLater(() -> {//推迟进行
+                    this.fileImage = thumbnail;//设置图像为新缩放图像
+                    updateImageSize(newWidth, newHeight);//更新图像大小
+                });
             }
         }
 
@@ -1574,14 +1399,6 @@ public class FileDisplayMainPanel {//图片预览主面板类
         @Override
         public void setVisible(boolean visible) {//设置是否可见
             super.setVisible(visible);//调用父类设置是否可见
-            if (visible && isGIF) {//如果可见且是GIF
-                startGIFAnimation();//开启GIF动画
-            } else {//否则
-                stopGIFAnimation();//停止GIF动画
-                if (GIFFrames.size() > 1) {//如果GIF帧数>1
-                    GIFFrames.subList(1, GIFFrames.size()).clear();//仅保留第一帧数据
-                }
-            }
         }
 
         @Override
@@ -1591,10 +1408,6 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 if (fileImage != null) {//如果图像非空
                     fileImage.flush();//释放图像
                     fileImage = null;//图像置空
-                }
-                if (GIFFrames != null) {//如果gif帧非空
-                    GIFFrames.forEach(BufferedImage::flush);//遍历清空
-                    GIFFrames.clear();//清空gif帧
                 }
                 if (hoverTipTimer != null && hoverTipTimer.isRunning()) {//如果有计时器
                     hoverTipTimer.stop();//停止计时器
@@ -1608,14 +1421,9 @@ public class FileDisplayMainPanel {//图片预览主面板类
         }
 
         public void dispose() {//进行释放时
-            stopGIFAnimation();//停止动画
             if (fileImage != null) {//如果文件图片不为空
                 fileImage.flush();//清空文件图片
                 fileImage = null;//文件图片置空
-            }
-            if (GIFFrames != null) {//如果gif帧非空
-                GIFFrames.forEach(BufferedImage::flush);//遍历清空
-                GIFFrames.clear();//清空gif帧
             }
             if (hoverTipTimer != null && hoverTipTimer.isRunning()) {//如果有计时器
                 hoverTipTimer.stop();//停止计时器
@@ -1634,14 +1442,14 @@ public class FileDisplayMainPanel {//图片预览主面板类
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
             try {
-                if (isGIF && !GIFFrames.isEmpty()) {//如果是GIF且GIF列表非空（GIF优先）
-                    g2d.drawImage(GIFFrames.get(currentGIFFrame), 0, 0, null);//绘制当前帧缓存图片
-                } else if (fileImage != null) {//否则非GIF，如果文件图片非空
-                    g2d.drawImage(fileImage, 0, 0, null);//绘制图像
+                if (fileImage != null) {//如果文件图片非空
+                    g2d.setColor(Main.SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景色
+                    g2d.fillRect(0, 0, getWidth(), fileImage.getHeight());//绘制背景色
+                    g2d.drawImage(fileImage, 0, 0, this);//绘制图像
                 }
 
                 if (textLines != null) {//如果不为空
-                    g.setColor(LIGHT_PICTURE_FONT_COLOR);//设置字体颜色
+                    g.setColor(Main.SettingState.themeColor ? DARK_PICTURE_FONT_COLOR : LIGHT_PICTURE_FONT_COLOR);//设置字体颜色
                     g.setFont(thumbnailItemFont);//设置字体
                     int y = fileImage.getHeight() + 18;//文本垂直位置为图像下方18px
                     for (String line : textLines) {//遍历文本行每一行
@@ -1651,13 +1459,13 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     }
                 }
 
-                if (selectionThumbnailItemList.contains(this) && Main.pictureManagementSystemFrame.isVisible()) {//如果图片被选中且不在幻灯片
+                if (selectionThumbnailItemList.contains(this) && Main.diskManagementSystemFrame.isVisible()) {//如果图片被选中且不在幻灯片
                     g2d.setStroke(new BasicStroke(BORDER_THICKNESS));//设置边框厚度
                     g2d.setColor(PICTURE_SELECTED_BORDER_COLOR);//设置边框颜色
                     g2d.drawRect(BORDER_THICKNESS / 2, BORDER_THICKNESS / 2, getWidth() - BORDER_THICKNESS, getHeight() - BORDER_THICKNESS);//绘制矩形
                 }
 
-                if (isCutOperation && clipboardFiles.contains(this.getFile()) && Main.pictureManagementSystemFrame.isVisible()) {//如果正在进行剪切且剪切板有这张图片且不在幻灯片
+                if (isCutOperation && clipboardFiles.contains(this.getFile()) && Main.diskManagementSystemFrame.isVisible()) {//如果正在进行剪切且剪切板有这张图片且不在幻灯片
                     g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));//设置混和边框
                     g2d.setColor(new Color(255, 255, 255, 150));//设置颜色为白色半透明
                     g2d.fillRect(0, 0, getWidth(), fileImage.getHeight());//绘制边框
