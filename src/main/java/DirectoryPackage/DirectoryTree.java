@@ -13,7 +13,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -21,7 +22,8 @@ import java.util.Objects;
 import static FileDisplayPackage.FileDisplayMainPanel.*;
 import static FileDisplayPackage.FileDisplayTopBar.*;
 import static MainPackage.Setting.*;
-import static MainPackage.ThemeColor.*;
+import static MainPackage.ThemeColor.DARK_DIRECTORY_MAIN_COLOR;
+import static MainPackage.ThemeColor.LIGHT_DIRECTORY_MAIN_COLOR;
 import static NetworkPackage.User.*;
 
 public class DirectoryTree {//目录树类：采用懒加载方式，即只有打开文件夹时才对目录进行加载，极大优化程序
@@ -46,7 +48,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         }
     };
 
-    private static File[] pictureFileList = null;//当前图片文件数组
+    private static File[] currentFileList = null;//当前文件数组
     public static Object currentNodeObject = null;//当前悬浮结点
 
     public DirectoryTree() {//构造方法
@@ -78,7 +80,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
                 Object nodeObject = selectedNode.getUserObject();//获取结点对象
                 if (nodeObject instanceof File selectedFile) {//如果结点对象是文件
                     if (!Objects.equals(currentFolder, selectedFile.getPath())) {//如果结点变化
-                        pictureFileList = detectPictureFile(selectedFile.listFiles());//更新图片文件列表
+                        currentFileList = detectPictureFile(selectedFile.listFiles());//更新文件列表
                         String currentFolder = selectedFile.getPath();//获取当前文件夹
                         FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
                         FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径文本
@@ -88,7 +90,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
                 } else if (nodeObject instanceof String && nodeObject.equals(Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
                     if (!Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果结点变化
                         try {
-                            pictureFileList = User.handleUserLoadUserUploadPicture(null);//更新图片文件列表
+                            currentFileList = User.handleUserLoadUserUploadPicture(null);//更新文件列表
                         } catch (IOException ex) {
                             handleErrorLog(ex.getMessage());//处理错误日志
                             throw new RuntimeException(ex);//捕获异常
@@ -158,7 +160,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
                 itemHoverTipWindow.dispose();//释放提示信息
                 itemHoverTipWindow = null;//提示信息置空
             }
-            mainPanel.removeAll();//清空
+            fileDisplayMainPanel.removeAll();//清空
             refreshMainPanel();//刷新
             directoryTree.setSelectionPath(directoryTree.getPathForRow(0));//选中节点
         }
@@ -172,16 +174,16 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         }
     }
 
-    public static File[] getPictureFileList() {//获取图片文件数组（供Main调用）
-        return pictureFileList;
+    public static File[] getCurrentFileList() {//获取当前文件列表（供Main调用）
+        return currentFileList;
     }
 
-    public static void setPictureFileList(File[] pictureFileList) {//设置图片文件列表（供PicturePreviewTopBar调用）
-        DirectoryTree.pictureFileList = pictureFileList;
+    public static void setCurrentFileList(File[] currentFileList) {//设置当前文件列表（供FileDisplayTopBar调用）
+        DirectoryTree.currentFileList = currentFileList;
     }
 
-    public static void updatePictureFileList(File[] fileList) {//更新图片文件列表
-        pictureFileList = detectPictureFile(fileList);//获取图片文件后赋值给图片文件数组
+    public static void updateCurrentFileList(File[] fileList) {//更新当前文件列表
+        DirectoryTree.currentFileList = detectPictureFile(fileList);//获取文件后赋值给当前文件数组
     }
 
     private static void configureTreeComponents(DefaultMutableTreeNode rootNode) {//配置树组件属性
@@ -206,7 +208,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
             }
         }
 
-        private void handleDirectoryExpansion(DefaultMutableTreeNode node) {//处理盘符根目录或图片目录或普通文件目录的展开
+        private void handleDirectoryExpansion(DefaultMutableTreeNode node) {//处理盘符根目录或普通文件目录的展开
             if (node.getChildCount() == 1 && ((DefaultMutableTreeNode) node.getChildAt(0)).getUserObject() instanceof Placeholder) {//检查是否需要移除占位符，如果只有一个子结点且该结点是占位符类
                 node.removeAllChildren();//移除占位符结点
                 loadDirectoryContents(node, (File) node.getUserObject());//加载实际内容
@@ -243,8 +245,8 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         private final Icon deviceIcon = new ImageIcon("src/material/image/home.png");//设备图标
         private final Icon computerIcon = new ImageIcon("src/material/image/myComputer.png");//我的电脑图标
         private final Icon driveIcon = new ImageIcon("src/material/image/disk.png");//磁盘图标
-        private final Icon folderOpenIcon = new ImageIcon("src/material/image/folderOpen.png");//文件夹图标
-        private final Icon folderCloseIcon = new ImageIcon("src/material/image/folderClose.png");//文件夹图标
+        private final Icon folderOpenIcon = new ImageIcon("src/material/image/folderOpen.png");//文件夹打开图标
+        private final Icon folderCloseIcon = new ImageIcon("src/material/image/folderClose.png");//文件夹关闭图标
         private final Icon cloudIcon = new ImageIcon("src/material/image/cloud.png");//云盘图标
 
         @Override
@@ -255,23 +257,14 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
 
             if (userObject instanceof String) {//如果是根结点或云盘
                 handleStringNodeRendering((String) userObject);//对根结点或云盘进行渲染
-            } else if (userObject instanceof File) { //如果是盘符根目录或图片目录或普通文件目录
-                handleFileNodeRendering((File) userObject);//对盘符根目录或图片目录或普通文件目录进行渲染
+            } else if (userObject instanceof File) { //如果是盘符根目录或普通文件目录
+                handleFileNodeRendering((File) userObject);//对盘符根目录或普通文件目录进行渲染
             }
-            if (Main.SettingState.backgroundPictureDirectory.isEmpty()) {//如果背景图片路径为空
-                setForeground(Main.SettingState.themeColor ? DARK_DIRECTORY_TEXT_NON_SELECTION_COLOR : LIGHT_DIRECTORY_TEXT_NON_SELECTION_COLOR);
-                setBackgroundSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_BACKGROUND_SELECTION_COLOR : LIGHT_DIRECTORY_BACKGROUND_SELECTION_COLOR);//设置选择背景颜色
-                setBackgroundNonSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_BACKGROUND_NON_SELECTION_COLOR : LIGHT_DIRECTORY_BACKGROUND_NON_SELECTION_COLOR);//设置未选择背景颜色
-                setTextSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_TEXT_SELECTION_COLOR : LIGHT_DIRECTORY_TEXT_SELECTION_COLOR);//设置选择文字颜色
-                setTextNonSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_TEXT_NON_SELECTION_COLOR : LIGHT_DIRECTORY_TEXT_NON_SELECTION_COLOR);//设置未选择文字颜色
-                setBorderSelectionColor(Main.SettingState.themeColor ? DARK_DIRECTORY_BORDER_SELECTION_COLOR : LIGHT_DIRECTORY_BORDER_SELECTION_COLOR);//设置选择边框颜色
-            } else {//否则
-                setBackgroundSelectionColor(new Color(255, 255, 255, 50));//设置选择背景颜色
-                setBackgroundNonSelectionColor(null);//设置未选择背景颜色
-                setTextSelectionColor(Color.black);//设置选择文字颜色
-                setTextNonSelectionColor(Color.black);//设置未选择文字颜色
-                setBorderSelectionColor(null);//设置选择边框颜色
-            }
+            setBackgroundSelectionColor(new Color(225, 225, 225, 100));//设置选择背景颜色
+            setBackgroundNonSelectionColor(null);//设置未选择背景颜色
+            setTextSelectionColor(Color.black);//设置选择文字颜色
+            setTextNonSelectionColor(Color.black);//设置未选择文字颜色
+            setBorderSelectionColor(null);//设置选择边框颜色
             return this;//返回自身
         }
 

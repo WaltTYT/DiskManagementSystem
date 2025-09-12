@@ -202,7 +202,7 @@ public class Setting {//设置类
             tutorialStep = 0;//重置为0
             tutorialWindow.dispose();//释放
             componentFocusable(true);//可聚焦
-            mainPanel.requestFocusInWindow();//请求焦点
+            fileDisplayMainPanel.requestFocusInWindow();//请求焦点
             return;//返回
         }
         tutorialWindow.setContentPane(new TutorialPanel(tutorialStepRecordList.get(stepIndex - 1)));//设置内容面板为通过记录类创建的教程面板
@@ -225,7 +225,7 @@ public class Setting {//设置类
         sortComboBox.setFocusable(focusable);
         searchField.getInputTextField().setFocusable(focusable);
         searchField.getActionButton().setFocusable(focusable);
-        mainPanel.setFocusable(focusable);
+        fileDisplayMainPanel.setFocusable(focusable);
         FileDisplayBottomBar.undoButton.setFocusable(focusable);
         FileDisplayBottomBar.redoButton.setFocusable(focusable);
         FileDisplayBottomBar.slideButton.setFocusable(focusable);
@@ -2741,8 +2741,6 @@ public class Setting {//设置类
                 SettingState.cacheStrategy = false;
                 SettingState.customRecycleCleanTime = 30;
                 SettingState.recycleStrategy = false;
-                SettingState.backgroundPictureDirectory = "";
-                SettingState.imageOpacity = 50;
                 SettingState.masterVolume = 88;
                 SettingState.masterState = false;
                 SettingState.bgmVolume = 0;

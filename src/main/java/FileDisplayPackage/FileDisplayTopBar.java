@@ -682,14 +682,14 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     handleRetreat();//递归
                 } else {//否则
                     try {
-                        DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                        DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                     } catch (IOException e) {
                         handleErrorLog(e.getMessage());//处理错误日志
                         throw new RuntimeException(e);//捕获异常
                     }
                 }
             } else {//否则
-                DirectoryTree.setPictureFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
             }
             directoryField.setTextField();//设置文件路径为当前文件夹
             updateMainPanel(false);//通知更新图片预览面板
@@ -709,14 +709,14 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     handleAdvance();//递归
                 } else {//否则
                     try {
-                        DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                        DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                     } catch (IOException e) {
                         handleErrorLog(e.getMessage());//处理错误日志
                         throw new RuntimeException(e);//捕获异常
                     }
                 }
             } else {//否则
-                DirectoryTree.setPictureFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
             }
             directoryField.setTextField();//设置文件路径为当前文件夹
             updateMainPanel(false);//通知更新图片预览面板
@@ -734,7 +734,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
             if (currentFileFolder.getParent() != null) {//如果该文件夹有父母
                 updateFolder(currentFileFolder.getParent());//设置当前文件夹为父母并更新当前文件夹和文件夹列表
                 directoryField.setTextField();//设置文件路径为当前文件夹
-                DirectoryTree.setPictureFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                 updateMainPanel(false);//通知更新图片预览面板
                 directoryManipulationButtonEnableJudgement();//目录操作按钮判断
             }
@@ -745,13 +745,13 @@ public class FileDisplayTopBar {//图片预览顶部栏
         if (currentFolder != null) {//如果当前文件夹不为空
             if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
                 try {
-                    DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                    DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                 } catch (IOException e) {
                     handleErrorLog(e.getMessage());//处理错误日志
                     throw new RuntimeException(e);//捕获异常
                 }
             } else {//否则
-                DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
             }
             updateMainPanel(false);//通知更新
             fileManipulationButtonEnableJudgement(getSelectionThumbnailItemList().size());//文件操作按钮判断
@@ -825,7 +825,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     @Override
                     protected void done() {//完成时
                         try {
-                            DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                            DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                         } catch (IOException e) {
                             handleErrorLog(e.getMessage());//处理错误日志
                             throw new RuntimeException(e);//捕获异常
@@ -893,7 +893,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
 
                     @Override
                     protected void done() {//完成时
-                        DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                        DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                         updateMainPanel(true);//通知更新
                         if (isCutOperation) {//如果是剪切操作
                             pasteButton.setEnabled(false);//设置不可粘贴
@@ -1082,7 +1082,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             List<String> newFileNameStringList = handleUserSaveUserUploadPicture(Collections.singletonList(newFile), false);//上传新文件
                             if (handleUserRemoveUserUploadPicture(Collections.singletonList(oldFile.getName()), false)) {//清除旧文件
                                 FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, Collections.singletonList(oldFile), Collections.singletonList(newFile), oldFile.getAbsolutePath(), null, newFileNameStringList, true));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
-                                DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                                DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                                 createBottomTipWindow(Main.SettingState.systemLanguage ? "Successful Cloud Picture Rename" : "云盘图片重命名成功");//提示
                             } else {//否则
                                 createBottomTipWindow(Main.SettingState.systemLanguage ? "Failed Cloud Picture Rename" : "云盘图片重命名失败");//提示
@@ -1093,7 +1093,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         }
                     } else {//否则
                         FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, Collections.singletonList(oldFile), Collections.singletonList(newFile), oldFile.getAbsolutePath(), null, null, false));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
-                        DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                        DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                     }
                     updateMainPanel(false);//通知更新
                     singleFileRenameDialog.dispose();//释放
@@ -1556,7 +1556,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         List<String> newFileNameStringList = handleUserSaveUserUploadPicture(targets, false);//上传新文件
                         if (handleUserRemoveUserUploadPicture(sources.stream().map(File::getName).collect(Collectors.toList()), false)) {//清除旧文件
                             FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, sources, targets, null, null, newFileNameStringList, true));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
-                            DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                            DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                             createBottomTipWindow(Main.SettingState.systemLanguage ? "Successful Cloud Picture Rename" : "云盘图片重命名成功");//提示
                         } else {//否则
                             createBottomTipWindow(Main.SettingState.systemLanguage ? "Failed Cloud Picture Rename" : "云盘图片重命名失败");//提示
@@ -1567,7 +1567,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     }
                 } else {//否则
                     FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, sources, targets, null, null, null, false));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
-                    DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                    DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                 }
                 updateMainPanel(false);//通知更新
                 multipleFileRenameDialog.dispose();//释放
@@ -1904,7 +1904,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         List<String> newFileNameStringList = handleUserSaveUserUploadPicture(targets, false);//上传新文件
                         if (handleUserRemoveUserUploadPicture(sources.stream().map(File::getName).collect(Collectors.toList()), false)) {//清除旧文件
                             FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, sources, targets, null, null, newFileNameStringList, true));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
-                            DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                            DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                             createBottomTipWindow(Main.SettingState.systemLanguage ? "Successful Cloud Picture Rename" : "云盘图片重命名成功");//提示
                         } else {//否则
                             createBottomTipWindow(Main.SettingState.systemLanguage ? "Failed Cloud Picture Rename" : "云盘图片重命名失败");//提示
@@ -1915,7 +1915,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     }
                 } else {//否则
                     FileDisplayBottomBar.recordFileOperation(new FileDisplayBottomBar.FileOperation(FileDisplayBottomBar.HistoryOperationType.RENAME, sources, targets, null, null, null, false));//记录文件复制操作，原文件列表，目标文件列表，旧文件完整原始路径
-                    DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                    DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                 }
                 updateMainPanel(false);//通知更新
                 multipleFileRenameDialog.dispose();//释放
@@ -2099,13 +2099,13 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     protected void done() {//完成时
                         if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
                             try {
-                                DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                                DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                             } catch (IOException e) {
                                 handleErrorLog(e.getMessage());//处理错误日志
                                 throw new RuntimeException(e);//捕获异常
                             }
                         } else {//否则
-                            DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                            DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                         }
                         new Timer(100, evt -> {//添加100ms延时确保组件完全卸载再通知更新
                             updateMainPanel(false);//更新面板
@@ -2180,13 +2180,13 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         protected void done() {//完成时
                             if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
                                 try {
-                                    DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                                    DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                                 } catch (IOException e) {
                                     handleErrorLog(e.getMessage());//处理错误日志
                                     throw new RuntimeException(e);//捕获异常
                                 }
                             } else {//否则
-                                DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                                DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                             }
                             new Timer(100, evt -> {//添加100ms延时确保组件完全卸载再通知更新
                                 updateMainPanel(false);//更新面板
@@ -2283,7 +2283,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                 if (path.equals(Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘
                     if (!Objects.equals(Main.SettingState.userAccount, "")) {//如果用户没有退出登录
                         try {
-                            DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                            DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                             updateMainPanel(false);//通知更新图片预览面板
                             directoryManipulationButtonEnableJudgement();//按钮判断
                         } catch (IOException e) {
@@ -2296,7 +2296,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                 } else {//否则
                     File target = new File(path);//根据路径创建文件
                     if (target.exists() && target.isDirectory()) {//如果文件存在且是文件夹
-                        DirectoryTree.setPictureFileList(detectPictureFile(target.listFiles()));//设置图片文件列表为当前文件夹
+                        DirectoryTree.setCurrentFileList(detectPictureFile(target.listFiles()));//设置图片文件列表为当前文件夹
                         updateMainPanel(false);//通知更新图片预览面板
                         directoryManipulationButtonEnableJudgement();//按钮判断
                     } else {//否则
@@ -2316,7 +2316,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             directoryTextField.setText(currentFolder);//恢复当前路径
                         } else {//否则
                             try {
-                                DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                                DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                                 updateMainPanel(false);//通知更新图片预览面板
                                 directoryManipulationButtonEnableJudgement();//按钮判断
                             } catch (IOException ex) {
@@ -2327,11 +2327,11 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     } else {//否则
                         File target = new File(path);//根据路径创建文件
                         if (target.exists() && target.isDirectory()) {//如果文件存在且是文件夹
-                            DirectoryTree.setPictureFileList(detectPictureFile(target.listFiles()));//设置图片文件列表为当前文件夹
+                            DirectoryTree.setCurrentFileList(detectPictureFile(target.listFiles()));//设置图片文件列表为当前文件夹
                         } else {//否则
                             createBottomTipWindow(Main.SettingState.systemLanguage ? "Nonexistent Path" : "路径不存在");//提示
                             directoryTextField.setText(currentFolder);//恢复当前路径
-                            DirectoryTree.setPictureFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                            DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                         }
                         updateMainPanel(false);//通知更新图片预览面板
                         directoryManipulationButtonEnableJudgement();//按钮判断
@@ -2347,7 +2347,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                         if (currentFolder.equals(Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘
                             directoryTextField.setText(currentFolder);//恢复当前路径
                             try {
-                                DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                                DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                                 updateMainPanel(false);//通知更新图片预览面板
                                 directoryManipulationButtonEnableJudgement();//按钮判断
                             } catch (IOException ex) {
@@ -2356,12 +2356,12 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             }
                         } else {//否则
                             directoryTextField.setText(currentFolder);//恢复当前路径
-                            DirectoryTree.setPictureFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                            DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                             updateMainPanel(false);//通知更新图片预览面板
                             directoryManipulationButtonEnableJudgement();//按钮判断
                         }
                     }
-                    mainPanel.requestFocusInWindow();//焦点返回主面板
+                    fileDisplayMainPanel.requestFocusInWindow();//焦点返回主面板
                     e.consume();//阻止默认行为
                 }
             }
@@ -2391,13 +2391,13 @@ public class FileDisplayTopBar {//图片预览顶部栏
                 directoryTextField.setText(currentFolder);//设置为当前文件夹
                 if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
                     try {
-                        DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                        DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                     } catch (IOException e) {
                         handleErrorLog(e.getMessage());//处理错误日志
                         throw new RuntimeException(e);//捕获异常
                     }
                 } else {//否则
-                    DirectoryTree.setPictureFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                    DirectoryTree.setCurrentFileList(detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                 }
                 updateMainPanel(false);//通知更新图片预览面板
                 directoryManipulationButtonEnableJudgement();//按钮判断
@@ -2453,7 +2453,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                     performSearch();//进行搜索
                     e.consume();//阻止默认行为
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {//如果按下ESC
-                    mainPanel.requestFocusInWindow();//焦点返回主面板
+                    fileDisplayMainPanel.requestFocusInWindow();//焦点返回主面板
                     e.consume();//阻止默认行为
                 }
             }
@@ -2512,13 +2512,13 @@ public class FileDisplayTopBar {//图片预览顶部栏
             if (keyword.isEmpty()) {//如果搜索文本为空
                 if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
                     try {
-                        DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                        DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(null));//更新图片文件列表
                     } catch (IOException ex) {
                         handleErrorLog(ex.getMessage());//处理错误日志
                         throw new RuntimeException(ex);//捕获异常
                     }
                 } else {//否则
-                    DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                    DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                 }
                 updateMainPanel(false);//通知更新
             } else {//否则
@@ -2537,14 +2537,14 @@ public class FileDisplayTopBar {//图片预览顶部栏
                             }).toList();//最终过滤获取结果列表
                         }
                         try {
-                            DirectoryTree.setPictureFileList(handleUserLoadUserUploadPicture(result.stream().map(File::getName).collect(Collectors.toList())));//更新图片文件列表
+                            DirectoryTree.setCurrentFileList(handleUserLoadUserUploadPicture(result.stream().map(File::getName).collect(Collectors.toList())));//更新图片文件列表
                         } catch (IOException e) {
                             handleErrorLog(e.getMessage());//处理错误日志
                             throw new RuntimeException(e);//捕获异常
                         }
                     }
                 } else {//否则
-                    DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                    DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
                     updateMainPanel(false);//通知更新
                     File[] allFiles = pictureFileList;//获取当前文件夹下所有图片文件
                     if (allFiles != null) {//如果文件列表非空
@@ -2558,7 +2558,7 @@ public class FileDisplayTopBar {//图片预览顶部栏
                                 return Arrays.stream(lowerCaseKeywords).allMatch(f.getName().toLowerCase()::contains);//如果小写关键字匹配小写文件名
                             }).toList();//最终过滤获取结果列表
                         }
-                        DirectoryTree.setPictureFileList(result.toArray(new File[0]));//通过结果列表更新图片文件列表
+                        DirectoryTree.setCurrentFileList(result.toArray(new File[0]));//通过结果列表更新图片文件列表
                     }
                 }
                 updateMainPanel(false);//通知更新

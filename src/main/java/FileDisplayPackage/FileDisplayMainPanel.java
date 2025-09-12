@@ -1,10 +1,10 @@
 package FileDisplayPackage;
 
 import DirectoryPackage.DirectoryTree;
+import FileEditPackage.FileEditToolBar;
 import MainPackage.Main;
 import MainPackage.Setting;
 import NetworkPackage.User;
-import FileEditPackage.FileEditToolBar;
 import com.ibm.icu.text.Collator;
 import com.ibm.icu.util.ULocale;
 import org.apache.commons.io.FilenameUtils;
@@ -38,13 +38,13 @@ import java.util.concurrent.TimeUnit;
 
 import static DirectoryPackage.DirectoryTree.bottomTipLabel;
 import static DirectoryPackage.DirectoryTree.createBottomTipWindow;
-import static MainPackage.Setting.*;
-import static MainPackage.ThemeColor.*;
-import static NetworkPackage.User.handleUserSaveUserUploadPicture;
 import static FileDisplayPackage.FileDisplayBottomBar.*;
 import static FileDisplayPackage.FileDisplayTopBar.*;
 import static FileEditPackage.FileEditToolBar.handleFirstPicture;
 import static FileEditPackage.FileEditToolBar.zoomTextField;
+import static MainPackage.Setting.*;
+import static MainPackage.ThemeColor.*;
+import static NetworkPackage.User.handleUserSaveUserUploadPicture;
 import static java.awt.Font.PLAIN;
 import static java.awt.event.InputEvent.*;
 
@@ -57,8 +57,8 @@ public class FileDisplayMainPanel {//图片预览主面板类
         ANAME, ADATE, ATYPE, ASIZE, DNAME, DDATE, DTYPE, DSIZE//0：名称排序（升序），1：日期排序（升序），2：类型排序（升序），3：大小排序（升序），4：名称排序（降序），5：日期排序（降序），6：类型排序（降序），7：大小排序（降序）
     }
 
-    public static JPanel mainPanel = null;//图片预览主面板：用于放置图片
-    public static JLabel emptyLabel = new JLabel(Main.SettingState.systemLanguage ? "No Image Available" : "暂无图片文件", SwingConstants.CENTER);//空状态提示标签：居中展示
+    public static JPanel fileDisplayMainPanel = null;//文件展示主面板：用于放置文件
+    public static JLabel emptyLabel = new JLabel(Main.SettingState.systemLanguage ? "No File" : "暂无文件", SwingConstants.CENTER);//空状态提示标签：居中展示
     public static JWindow itemHoverTipWindow;//项目悬浮提示窗口
     public static JWindow draggedThumbnailItemWindow = null;//被拖拽缩略图项目窗口
     public static final JWindow progressWindow = new JWindow();//进度条窗口
@@ -148,7 +148,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
         public void actionPerformed(ActionEvent evt) {//如果执行
             if (dragging) {//仅在拖动时滚动
                 try {
-                    JScrollPane scrollPane = (JScrollPane) mainPanel.getParent().getParent();//获取滚动条（注意mainPanel的父组件是视口，还要获得一次父组件才能获取滚动条）
+                    JScrollPane scrollPane = (JScrollPane) fileDisplayMainPanel.getParent().getParent();//获取滚动条（注意mainPanel的父组件是视口，还要获得一次父组件才能获取滚动条）
                     JViewport viewport = scrollPane.getViewport();//获取视口
                     JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();//获取垂直滚动框
                     Point mouseScreenPoint = MouseInfo.getPointerInfo().getLocation();//获取鼠标位置
@@ -200,7 +200,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     public FileDisplayMainPanel() {//构造方法：初始化UI布局
-        mainPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 15, 15)) {//布局管理器为自动换行的流式布局（向左对齐），水平和垂直间隔为15
+        fileDisplayMainPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 15, 15)) {//布局管理器为自动换行的流式布局（向左对齐），水平和垂直间隔为15
             @Override
             protected void paintChildren(Graphics g) {//重写方法
                 super.paintChildren(g);//先绘制子组件（缩略图）
@@ -218,20 +218,16 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 }
             }
         };
-        mainPanel.setFocusable(true);//确保面板可获取焦点
-        mainPanel.requestFocusInWindow();//初始化后直接获取焦点
-        mainPanel.setDoubleBuffered(true);//使用双缓冲加速
-        mainPanel.setBackground(Main.SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景颜色
-        mainPanel.addMouseListener(new SelectionMouseAdapter());//主面板添加鼠标监听
-        mainPanel.addMouseMotionListener(new SelectionMouseAdapter());//主面板添加鼠标动作监听
-        mainPanel.addMouseWheelListener(new SelectionMouseAdapter());//主面板添加鼠标滚轮监听
+        fileDisplayMainPanel.setFocusable(true);//确保面板可获取焦点
+        fileDisplayMainPanel.requestFocusInWindow();//初始化后直接获取焦点
+        fileDisplayMainPanel.setDoubleBuffered(true);//使用双缓冲加速
+        fileDisplayMainPanel.setBackground(Main.SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景颜色
+        fileDisplayMainPanel.addMouseListener(new SelectionMouseAdapter());//主面板添加鼠标监听
+        fileDisplayMainPanel.addMouseMotionListener(new SelectionMouseAdapter());//主面板添加鼠标动作监听
+        fileDisplayMainPanel.addMouseWheelListener(new SelectionMouseAdapter());//主面板添加鼠标滚轮监听
 
         emptyLabel.setFont(new Font("微软雅黑", PLAIN, 25));//设置字体
-        if (Main.SettingState.backgroundPictureDirectory.isEmpty()) {//如果背景图片路径为空
-            emptyLabel.setForeground(Main.SettingState.themeColor ? DARK_PICTURE_EMPTY_COLOR : LIGHT_PICTURE_EMPTY_COLOR);//设置前景色
-        } else {//否则
-            emptyLabel.setForeground(LIGHT_PICTURE_EMPTY_COLOR);//设置前景色
-        }
+        emptyLabel.setForeground(LIGHT_PICTURE_EMPTY_COLOR);//设置前景色
         showEmptyState();//初始显示空状态
 
         circularProgressBar = new JProgressBar() {//初始化圆形进度条
@@ -296,7 +292,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     private static void showEmptyState() {//显示空状态提示
-        mainPanel.add(emptyLabel, BorderLayout.CENTER);//添加空状态标签到主面板的中心区域
+        fileDisplayMainPanel.add(emptyLabel, BorderLayout.CENTER);//添加空状态标签到主面板的中心区域
         refreshMainPanel();//刷新
     }
 
@@ -315,8 +311,8 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     public static void initMainPanelShortcuts() {//启用主面板快捷键并设置键盘按键绑定
-        InputMap inputMap = mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);//获取主面板输入映射，如果聚焦主面板则监听主面板的键盘输入
-        ActionMap actionMap = mainPanel.getActionMap();//获取主面板行动映射
+        InputMap inputMap = fileDisplayMainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);//获取主面板输入映射，如果聚焦主面板则监听主面板的键盘输入
+        ActionMap actionMap = fileDisplayMainPanel.getActionMap();//获取主面板行动映射
 
         bindKey(inputMap, actionMap, KeyEvent.VK_LEFT, ALT_DOWN_MASK, "retreat");//后退
         bindKey(inputMap, actionMap, KeyEvent.VK_RIGHT, ALT_DOWN_MASK, "advance");//前进
@@ -536,7 +532,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
 
         @Override
         public void mouseClicked(MouseEvent e) {//如果鼠标点击
-            mainPanel.requestFocusInWindow();//确保主面板被点击时刷新键盘绑定
+            fileDisplayMainPanel.requestFocusInWindow();//确保主面板被点击时刷新键盘绑定
             if (SwingUtilities.isRightMouseButton(e)) {//如果是鼠标右键
                 FileDisplayPopupMenu.rightMousePopupMenu.show(Main.pictureManagementSystemFrame, e.getLocationOnScreen().x, e.getLocationOnScreen().y);//展示右键菜单
             }
@@ -560,10 +556,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     int width = Math.abs(e.getX() - selectionStart.x);//获取宽度
                     int height = Math.abs(e.getY() - selectionStart.y);//获取高度
                     selectionRect.setBounds(x, y, width, height);//绘制框架：从左上角开始绘制宽为width高为height的矩形
-                    mainPanel.repaint();//触发重绘
+                    fileDisplayMainPanel.repaint();//触发重绘
 
                     try {
-                        JScrollPane scrollPane = (JScrollPane) mainPanel.getParent().getParent();//获取滚动条
+                        JScrollPane scrollPane = (JScrollPane) fileDisplayMainPanel.getParent().getParent();//获取滚动条
                         JViewport viewport = scrollPane.getViewport();//获取视口
                         Point mouseScreenPoint = e.getLocationOnScreen();//获取鼠标位置
                         Point viewportScreenPoint = viewport.getLocationOnScreen();//获取视口在屏幕的位置
@@ -595,7 +591,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 handleSelection(e);//就选中图片
                 selectionStart = null;//起点清空
                 selectionRect.setBounds(0, 0, 0, 0);//矩形清空
-                mainPanel.repaint();//触发重绘
+                fileDisplayMainPanel.repaint();//触发重绘
             }
         }
 
@@ -608,7 +604,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 }
                 handleZoom(e);//进行缩放处理
             } else {//否则进行滚动
-                mainPanel.getParent().dispatchEvent(e);//传递滚动事件给父容器
+                fileDisplayMainPanel.getParent().dispatchEvent(e);//传递滚动事件给父容器
             }
         }
 
@@ -638,7 +634,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
             loading = true;//开始加载
             Main.pictureManagementSystemFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));//设置光标为等待
             zoomSlider.setValue(imageWidth);//设置拖动条的值
-            JScrollPane scrollPane = (JScrollPane) mainPanel.getParent().getParent();//获取滚动条
+            JScrollPane scrollPane = (JScrollPane) fileDisplayMainPanel.getParent().getParent();//获取滚动条
             JViewport viewport = scrollPane.getViewport();//获取视口
             Point originalPos = viewport.getViewPosition();//获取视口位置
             if (currentWorker != null && !currentWorker.isDone()) {//如果当前有工作
@@ -825,12 +821,12 @@ public class FileDisplayMainPanel {//图片预览主面板类
         }
         loading = true;//图像正在加载
         slideButton.setEnabled(false);//幻灯片按钮无效
-        pictureFileList = DirectoryTree.getPictureFileList();//获取图片文件列表
-        mainPanel.removeAll();//清空主面板
+        pictureFileList = DirectoryTree.getCurrentFileList();//获取图片文件列表
+        fileDisplayMainPanel.removeAll();//清空主面板
         thumbnailItemList.clear();//清空缩略图项目列表
         selectionThumbnailItemList.clear();//清空选中缩略图项目列表
         imageTotalKiloByte = 0;//清空图片总大小
-        for (Component comp : mainPanel.getComponents()) {//遍历所有组件
+        for (Component comp : fileDisplayMainPanel.getComponents()) {//遍历所有组件
             if (comp instanceof ThumbnailItem item) {//如果组件是缩略图项目类
                 item.stopGIFAnimation();//停止所有正在进行的动画
             }
@@ -880,10 +876,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
                         }
                         thumbnailItemList.add(item);//向列表添加项目
                         processedFiles++;//已处理文件增加
-                        mainPanel.add(item);//向主面板中添加项目
+                        fileDisplayMainPanel.add(item);//向主面板中添加项目
                     }
-                    mainPanel.revalidate();//重新验证布局
-                    mainPanel.repaint();//重新绘制
+                    fileDisplayMainPanel.revalidate();//重新验证布局
+                    fileDisplayMainPanel.repaint();//重新绘制
                     updateProgress(100 * processedFiles / totalFiles);//更新进度条
                 }
 
@@ -1028,8 +1024,8 @@ public class FileDisplayMainPanel {//图片预览主面板类
         item.addMouseListener(new MouseAdapter() {//创建鼠标监听
             @Override
             public void mouseClicked(MouseEvent e) {//如果鼠标点击
-                if (!mainPanel.hasFocus()) {//如果只对项目进行点击时
-                    mainPanel.requestFocusInWindow();//主面板要获取焦点防止快捷键失效
+                if (!fileDisplayMainPanel.hasFocus()) {//如果只对项目进行点击时
+                    fileDisplayMainPanel.requestFocusInWindow();//主面板要获取焦点防止快捷键失效
                 }
                 if (SwingUtilities.isLeftMouseButton(e)) {//如果是鼠标左键
                     if ((e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {//如果ctrl键被按下
@@ -1060,7 +1056,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     if (DirectoryTree.currentNodeObject != null) {//如果当前结点对象非空
                         if (DirectoryTree.currentNodeObject instanceof File selectedFile) {//如果当前结点对象是文件
                             String currentFolder = selectedFile.getPath();//获取当前文件夹
-                            DirectoryTree.setPictureFileList(DirectoryTree.detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                            DirectoryTree.setCurrentFileList(DirectoryTree.detectPictureFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                             FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
                             FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径
                             FileDisplayMainPanel.updateMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
@@ -1069,7 +1065,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                         } else if (Objects.equals(DirectoryTree.currentNodeObject, (Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘"))) {//如果是云盘结点
                             String currentFolder = Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘";//获取当前文件夹
                             try {
-                                DirectoryTree.setPictureFileList(User.handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                                DirectoryTree.setCurrentFileList(User.handleUserLoadUserUploadPicture(null));//更新图片文件列表
                             } catch (IOException ex) {
                                 handleErrorLog(ex.getMessage());//处理错误日志
                                 throw new RuntimeException(ex);//捕获异常
@@ -1099,7 +1095,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     handleSelection(e);//就选中图片
                     selectionStart = null;//起点清空
                     selectionRect.setBounds(0, 0, 0, 0);//矩形清空
-                    mainPanel.repaint();//触发重绘
+                    fileDisplayMainPanel.repaint();//触发重绘
                     dragging = false;//清除拖动状态
                 }
             }
@@ -1157,10 +1153,10 @@ public class FileDisplayMainPanel {//图片预览主面板类
                     int width = Math.abs(item.getX() + e.getX() - selectionStart.x);//获取宽度
                     int height = Math.abs(item.getY() + e.getY() - selectionStart.y);//获取高度
                     selectionRect.setBounds(x, y, width, height);//绘制框架：从左上角开始绘制宽为width高为height的矩形
-                    mainPanel.repaint();//触发重绘
+                    fileDisplayMainPanel.repaint();//触发重绘
 
                     try {
-                        JScrollPane scrollPane = (JScrollPane) mainPanel.getParent().getParent();//获取滚动条
+                        JScrollPane scrollPane = (JScrollPane) fileDisplayMainPanel.getParent().getParent();//获取滚动条
                         JViewport viewport = scrollPane.getViewport();//获取视口
                         Point mouseScreenPoint = e.getLocationOnScreen();//获取鼠标位置
                         Point viewportScreenPoint = viewport.getLocationOnScreen();//获取视口在屏幕的位置
@@ -1258,8 +1254,8 @@ public class FileDisplayMainPanel {//图片预览主面板类
     }
 
     public static void refreshMainPanel() {//刷新主面板
-        mainPanel.revalidate();//重新验证
-        mainPanel.repaint();//重新绘制
+        fileDisplayMainPanel.revalidate();//重新验证
+        fileDisplayMainPanel.repaint();//重新绘制
     }
 
     public static class ThumbnailItem extends JComponent {//缩略图项目类（继承JComponent）
@@ -1404,7 +1400,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 GIFAnimationTimer = new Timer(frameDelays[0], _ -> {//开启计时器，第一次延迟为帧延迟列表的第一个元素
                     Rectangle compBounds = getBounds();//获取组件在滚动面板中的可见性
                     compBounds.setLocation(getLocation());//设置位置
-                    if (!isShowing() || !isVisible() || !mainPanel.getVisibleRect().intersects(compBounds)) {//可见性检测
+                    if (!isShowing() || !isVisible() || !fileDisplayMainPanel.getVisibleRect().intersects(compBounds)) {//可见性检测
                         return;//如果不可见就返回
                     }
                     currentGIFFrame = (currentGIFFrame + 1) % Math.min(GIFFrames.size(), MAX_GIF_FRAME_AMOUNT + 1);//当前帧循环（在帧大小和最大帧数量取最小值后的范围内）
@@ -1645,11 +1641,7 @@ public class FileDisplayMainPanel {//图片预览主面板类
                 }
 
                 if (textLines != null) {//如果不为空
-                    if (Main.SettingState.backgroundPictureDirectory.isEmpty()) {//如果背景图片为空
-                        g.setColor(Main.SettingState.themeColor ? DARK_PICTURE_FONT_COLOR : LIGHT_PICTURE_FONT_COLOR);//设置字体颜色
-                    } else {//否则
-                        g.setColor(LIGHT_PICTURE_FONT_COLOR);//设置字体颜色
-                    }
+                    g.setColor(LIGHT_PICTURE_FONT_COLOR);//设置字体颜色
                     g.setFont(thumbnailItemFont);//设置字体
                     int y = fileImage.getHeight() + 18;//文本垂直位置为图像下方18px
                     for (String line : textLines) {//遍历文本行每一行

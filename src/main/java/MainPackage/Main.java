@@ -81,9 +81,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
         public static boolean cacheStrategy;//缓存策略
         public static int customRecycleCleanTime;//自定义回收清理时间
         public static boolean recycleStrategy;//回收策略
-        public static String pictureDirectory;//图片路径
-        public static String backgroundPictureDirectory;//背景图片路径
-        public static int imageOpacity;//图片不透明度
         public static int masterVolume;//总体音量
         public static boolean masterState;//总体状态
         public static int bgmVolume;//背景音乐音量
@@ -168,9 +165,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 SettingState.cacheStrategy = false;
                 SettingState.customRecycleCleanTime = 30;
                 SettingState.recycleStrategy = false;
-                SettingState.pictureDirectory = "";
-                SettingState.backgroundPictureDirectory = "";
-                SettingState.imageOpacity = 50;
                 SettingState.masterVolume = 88;
                 SettingState.masterState = false;
                 SettingState.bgmVolume = 0;
@@ -204,9 +198,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                 SettingState.cacheStrategy = json.getBoolean("cacheStrategy");
                 SettingState.customRecycleCleanTime = json.getInt("customRecycleCleanTime");
                 SettingState.recycleStrategy = json.getBoolean("recycleStrategy");
-                SettingState.pictureDirectory = json.getString("pictureDirectory");
-                SettingState.backgroundPictureDirectory = json.getString("backgroundPictureDirectory");
-                SettingState.imageOpacity = json.getInt("imageOpacity");
                 SettingState.masterVolume = json.getInt("masterVolume");
                 SettingState.masterState = json.getBoolean("masterState");
                 SettingState.bgmVolume = json.getInt("bgmVolume");
@@ -250,7 +241,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
 
         directoryTreeScrollPane = new JScrollPane(DirectoryTree.directoryTree);//为目录树面板添加滚动条
         picturePreviewTopBarPanel = topBarPanel;//获取顶部栏面板（固定高度）
-        picturePreviewMainPanelScrollPane = new JScrollPane(mainPanel) {//创建主面板滚动栏
+        picturePreviewMainPanelScrollPane = new JScrollPane(fileDisplayMainPanel) {//创建主面板滚动栏
             @Override
             protected void paintComponent(Graphics g) {//重写绘制方法
                 super.paintComponent(g);//调用父类方法绘制清除背景
@@ -422,7 +413,7 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                                     }
                                 }
                                 if (flag) {//如果需要刷新
-                                    DirectoryTree.updatePictureFileList(currentPictureFileList);//更新文件夹
+                                    DirectoryTree.updateCurrentFileList(currentPictureFileList);//更新文件夹
                                     updateMainPanel(false);//通知更新
                                     fileManipulationButtonEnableJudgement(getSelectionThumbnailItemList().size());//文件操作按钮判断
                                     directoryManipulationButtonEnableJudgement();//目录操作按钮判断
@@ -473,9 +464,6 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
                     SettingState.settingStateHashMap.put("cacheStrategy", String.valueOf(SettingState.cacheStrategy));
                     SettingState.settingStateHashMap.put("customRecycleCleanTime", String.valueOf(SettingState.customRecycleCleanTime));
                     SettingState.settingStateHashMap.put("recycleStrategy", String.valueOf(SettingState.recycleStrategy));
-                    SettingState.settingStateHashMap.put("pictureDirectory", SettingState.pictureDirectory.replace("\\\\", "\\"));//防止\\不断重复
-                    SettingState.settingStateHashMap.put("backgroundPictureDirectory", SettingState.backgroundPictureDirectory.replace("\\\\", "\\"));//防止\\不断重复
-                    SettingState.settingStateHashMap.put("imageOpacity", String.valueOf(SettingState.imageOpacity));
                     SettingState.settingStateHashMap.put("masterVolume", String.valueOf(SettingState.masterVolume));
                     SettingState.settingStateHashMap.put("masterState", String.valueOf(SettingState.masterState));
                     SettingState.settingStateHashMap.put("bgmVolume", String.valueOf(SettingState.bgmVolume));
@@ -724,34 +712,19 @@ public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 
         @Override
         protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {//重写绘制轨道
             boolean isVertical = scrollbar.getOrientation() == SwingConstants.VERTICAL;//判断是否为垂直滚动条
-            if (SettingState.backgroundPictureDirectory.isEmpty()) {//如果背景不存在：恢复默认轨道
-                if (isThumbRollover() || isDragging) {//如果滑块悬停或拖动：显示半透明颜色
-                    Graphics2D g2d = (Graphics2D) g.create();//创建g2d工具
-                    g2d.setColor(SettingState.themeColor ? DARK_SCROLL_PANE_TRACK_COLOR : LIGHT_SCROLL_PANE_TRACK_COLOR);//轨道颜色
-                    if (isVertical) {//如果是垂直滚动条
-                        g2d.fillRect(trackBounds.x, trackBounds.y, 12, trackBounds.height);//填充矩形
-                    } else {//否则
-                        g2d.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, 12);//填充矩形
-                    }
-                    g2d.dispose();//释放
+            if (isThumbRollover() || isDragging) {//如果滑块悬停或拖动：显示半透明颜色
+                Graphics2D g2d = (Graphics2D) g.create();//创建g2d工具
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));//设置混合颜色
+                g2d.setColor(LIGHT_SCROLL_PANE_TRACK_COLOR);//轨道颜色
+                if (isVertical) {//如果是垂直滚动条
+                    g2d.fillRect(trackBounds.x, trackBounds.y, 12, trackBounds.height);//填充矩形
+                } else {//否则
+                    g2d.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, 12);//填充矩形
                 }
-                c.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景颜色
-                c.setOpaque(true);//设置不透明
-            } else {//否则背景存在：轨道透明
-                if (isThumbRollover() || isDragging) {//如果滑块悬停或拖动：显示半透明颜色
-                    Graphics2D g2d = (Graphics2D) g.create();//创建g2d工具
-                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));//设置混合颜色
-                    g2d.setColor(LIGHT_SCROLL_PANE_TRACK_COLOR);//轨道颜色
-                    if (isVertical) {//如果是垂直滚动条
-                        g2d.fillRect(trackBounds.x, trackBounds.y, 12, trackBounds.height);//填充矩形
-                    } else {//否则
-                        g2d.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, 12);//填充矩形
-                    }
-                    g2d.dispose();//释放
-                }
-                c.setBackground(null);//设置无背景
-                c.setOpaque(false);//设置透明
+                g2d.dispose();//释放
             }
+            c.setBackground(null);//设置无背景
+            c.setOpaque(false);//设置透明
             if (isVertical) {//如果是垂直滚动条
                 c.setPreferredSize(new Dimension(12, c.getHeight()));//设置大小
             } else {//否则

@@ -62,22 +62,6 @@ public class ThemeColor {//主题颜色类
 
     public static void switchThemeColor() {//切换主题颜色
         boolean themeColor = Main.SettingState.themeColor;//获取主题颜色
-        if (Main.SettingState.backgroundPictureDirectory.isEmpty()) {//如果背景图片路径为空
-            Main.bottomTipInformation.setBackground(themeColor ? DARK_TIP_IMFORMATION_COLOR : LIGHT_TIP_IMFORMATION_COLOR);//设置提示信息字体背景颜色
-            Main.bottomTipInformationPanel.setBackground(themeColor ? DARK_TIP_IMFORMATION_COLOR : LIGHT_TIP_IMFORMATION_COLOR);//设置提示信息面板背景颜色
-            DirectoryTree.directoryTree.setBackground(themeColor ? DARK_DIRECTORY_MAIN_COLOR : LIGHT_DIRECTORY_MAIN_COLOR);//设置背景色
-            DirectoryTree.directoryTree.setCellRenderer(new DirectoryTree.DriveTreeRenderer());//设置自定义节点渲染器
-            FileDisplayBottomBar.zoomSlider.setBackground(themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景颜色
-            FileDisplayBottomBar.bottomBarPanel.setBackground(themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景颜色
-            FileDisplayMainPanel.mainPanel.setBackground(themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景颜色
-            FileDisplayMainPanel.emptyLabel.setForeground(themeColor ? DARK_PICTURE_EMPTY_COLOR : LIGHT_PICTURE_EMPTY_COLOR);//设置前景色
-            FileDisplayTopBar.topBarPanel.setBackground(themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景颜色
-            Main.directoryTreeScrollPane.getVerticalScrollBar().repaint();//重新绘制
-            Main.directoryTreeScrollPane.getHorizontalScrollBar().repaint();//重新绘制
-            Main.picturePreviewMainPanelScrollPane.getVerticalScrollBar().repaint();//重新绘制
-            Main.picturePreviewMainPanelScrollPane.getHorizontalScrollBar().repaint();//重新绘制
-        }
-
         FileDisplayMainPanel.refreshMainPanel();//刷新
         Setting.initSettingDialog();//刷新设置菜单
         if (Main.SettingState.userAccount.isEmpty()) {//如果没有用户名

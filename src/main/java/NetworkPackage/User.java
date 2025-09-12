@@ -415,9 +415,6 @@ public class User {//用户类
         dos.writeBoolean(Main.SettingState.cacheStrategy);//输出
         dos.writeInt(Main.SettingState.customRecycleCleanTime);//输出
         dos.writeBoolean(Main.SettingState.recycleStrategy);//输出
-        dos.writeUTF(Main.SettingState.pictureDirectory);//输出
-        dos.writeUTF(Main.SettingState.backgroundPictureDirectory);//输出
-        dos.writeInt(Main.SettingState.imageOpacity);//输出
         dos.writeInt(Main.SettingState.masterVolume);//输出
         dos.writeBoolean(Main.SettingState.masterState);//输出
         dos.writeInt(Main.SettingState.bgmVolume);//输出
@@ -467,20 +464,6 @@ public class User {//用户类
         Main.SettingState.cacheStrategy = dis.readBoolean();//补全
         Main.SettingState.customRecycleCleanTime = dis.readInt();//补全
         Main.SettingState.recycleStrategy = dis.readBoolean();//补全
-        String pictureDirectory = dis.readUTF();//读取图片路径
-        File pictureDirectoryFile = new File(pictureDirectory);//根据图片路径创建文件夹
-        if (pictureDirectoryFile.exists() && pictureDirectoryFile.isDirectory()) {//如果该路径存在且为文件夹
-            Main.SettingState.pictureDirectory = pictureDirectory;//补全
-        } else {//否则
-            createBottomTipWindow(Main.SettingState.systemLanguage ? "The User's Picture Directory Do Not Exist On This Computer, Cloud Synchronization Of Picture Directory Has Been Skipped" : "该用户的图片路径在此电脑不存在，已跳过对图片路径的云同步");//提示
-        }
-        String backgroundPictureDirectory = dis.readUTF();//读取背景图片路径
-        if (new File(backgroundPictureDirectory).exists()) {//如果该路径存在
-            Main.SettingState.backgroundPictureDirectory = backgroundPictureDirectory;//补全
-        } else {//否则
-            createBottomTipWindow(Main.SettingState.systemLanguage ? "The User's Background Picture Do Not Exist On This Computer, Cloud Synchronization Of Background Picture Has Been Skipped" : "该用户的背景图片在此电脑不存在，已跳过对背景图片的云同步");//提示
-        }
-        Main.SettingState.imageOpacity = dis.readInt();//补全
         Main.SettingState.masterVolume = dis.readInt();//补全
         Main.SettingState.masterState = dis.readBoolean();//补全
         Main.SettingState.bgmVolume = dis.readInt();//补全
@@ -850,9 +833,6 @@ public class User {//用户类
         dos.writeBoolean(Main.SettingState.cacheStrategy);//输出
         dos.writeInt(Main.SettingState.customRecycleCleanTime);//输出
         dos.writeBoolean(Main.SettingState.recycleStrategy);//输出
-        dos.writeUTF(Main.SettingState.pictureDirectory);//输出
-        dos.writeUTF(Main.SettingState.backgroundPictureDirectory);//输出
-        dos.writeInt(Main.SettingState.imageOpacity);//输出
         dos.writeInt(Main.SettingState.masterVolume);//输出
         dos.writeBoolean(Main.SettingState.masterState);//输出
         dos.writeInt(Main.SettingState.bgmVolume);//输出

@@ -567,14 +567,14 @@ public class FileDisplayBottomBar {//图片预览底部栏
     public static void refreshAfterFileHistoryOperation() {//在文件历史操作后进行刷新
         if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点
             try {
-                DirectoryTree.setPictureFileList(User.handleUserLoadUserUploadPicture(null));//更新图片文件列表
+                DirectoryTree.setCurrentFileList(User.handleUserLoadUserUploadPicture(null));//更新图片文件列表
             } catch (IOException e) {
                 handleErrorLog(e.getMessage());//处理错误日志
                 throw new RuntimeException(e);//捕获异常
             }
         } else {//否则
             if (currentFolder != null) {//如果不为空
-                DirectoryTree.updatePictureFileList(new File(currentFolder).listFiles());//更新文件夹
+                DirectoryTree.updateCurrentFileList(new File(currentFolder).listFiles());//更新文件夹
             }
         }
         new Timer(100, e -> {//在100ms时延后进行
