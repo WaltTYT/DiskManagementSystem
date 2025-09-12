@@ -440,16 +440,6 @@ public class FileDisplayMainPanel {//图片预览主面板类
             case "emptyRecycleBin":
                 FileDisplayPopupMenu.handleEmptyRecycleBin();//调用清空回收站
                 break;
-            case "setAsBackground":
-                if (selectionThumbnailItemList.size() == 1) {//如果选中图片大小为1
-                    if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果在云盘结点设置
-                        Main.SettingState.backgroundPictureDirectory = "My Cloud\\" + selectionThumbnailItemList.getFirst().getFile().getName();//记录
-                    } else {//否则
-                        Main.SettingState.backgroundPictureDirectory = selectionThumbnailItemList.getFirst().getFile().getAbsolutePath();//记录
-                    }
-                    Setting.initTransparentBackground();//初始化透明背景图片
-                }
-                break;
             case "setAsLockscreen":
                 FileDisplayPopupMenu.handleSetAsLockscreen();//调用设置为锁屏
                 break;

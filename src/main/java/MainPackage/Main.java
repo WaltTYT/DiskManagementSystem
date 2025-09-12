@@ -1,7 +1,6 @@
 package MainPackage;
 
 import DirectoryPackage.DirectoryTree;
-import NetworkPackage.User;
 import FileDisplayPackage.FileDisplayBottomBar;
 import FileDisplayPackage.FileDisplayMainPanel;
 import FileDisplayPackage.FileDisplayPopupMenu;
@@ -9,6 +8,7 @@ import FileDisplayPackage.FileDisplayTopBar;
 import FileEditPackage.FileEditPanel;
 import FileEditPackage.FileEditScrollPane;
 import FileEditPackage.FileEditToolBar;
+import NetworkPackage.User;
 import org.json.JSONObject;
 
 import javax.imageio.ImageIO;
@@ -25,16 +25,16 @@ import java.util.HashMap;
 import java.util.Objects;
 
 import static DirectoryPackage.DirectoryTree.*;
-import static MainPackage.Setting.handleErrorLog;
-import static MainPackage.ThemeColor.*;
 import static FileDisplayPackage.FileDisplayBottomBar.bottomBarPanel;
 import static FileDisplayPackage.FileDisplayMainPanel.*;
 import static FileDisplayPackage.FileDisplayTopBar.*;
 import static FileEditPackage.FileEditPanel.*;
 import static FileEditPackage.FileEditScrollPane.scrollPane;
 import static FileEditPackage.FileEditToolBar.toolBarPanel;
+import static MainPackage.Setting.handleErrorLog;
+import static MainPackage.ThemeColor.*;
 
-public class Main {//主类 TODO 难：缩放优化 托盘 壁纸轮换 编辑 真幻灯片 拼图 上下左右 缓存 找回密码 搜索匹配名称变红 易：收藏 头像 邮箱 16414
+public class Main {//主类 TODO 开机 加载固定文件夹（磁盘分区） 加载FAT 以该文件夹为根目录加载目录树 显示图形化界面
     public static DirectoryTree directoryTree;//目录树类
     public static FileDisplayTopBar picturePreviewTopBar;//图片预览顶部栏类
     public static FileDisplayMainPanel picturePreviewMainPanel;//图片预览主面板类
@@ -286,27 +286,24 @@ public class Main {//主类 TODO 难：缩放优化 托盘 壁纸轮换 编辑 �
         bottomTipInformationPanel.add(bottomTipInformation);//添加提示信息到提示信息面板中
         bottomTipInformationPanel.setBackground(SettingState.themeColor ? DARK_TIP_IMFORMATION_COLOR : LIGHT_TIP_IMFORMATION_COLOR);//设置提示信息面板背景颜色
 
-        if (!SettingState.backgroundPictureDirectory.isEmpty()) {//如果背景图片路径不为空
-            Setting.initTransparentBackground();//初始化透明背景
-        } else {//否则
-            directoryTreeScrollPane.setBackground(SettingState.themeColor ? DARK_DIRECTORY_MAIN_COLOR : LIGHT_DIRECTORY_MAIN_COLOR);//设置背景
-            directoryTreeScrollPane.setOpaque(true);//设置不透明
-            directoryTreeScrollPane.getViewport().setBackground(SettingState.themeColor ? DARK_DIRECTORY_MAIN_COLOR : LIGHT_DIRECTORY_MAIN_COLOR);//设置背景
-            directoryTreeScrollPane.getViewport().setOpaque(true);//设置不透明
-            picturePreviewBottomBarPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景
-            picturePreviewBottomBarPanel.setOpaque(true);//设置不透明
-            picturePreviewMainPanelScrollPane.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
-            picturePreviewMainPanelScrollPane.setOpaque(true);//设置不透明
-            picturePreviewMainPanelScrollPane.getViewport().setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
-            picturePreviewMainPanelScrollPane.getViewport().setOpaque(true);//设置不透明
-            picturePreviewTopBarPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景
-            picturePreviewTopBarPanel.setOpaque(true);//设置不透明
-            picturePreviewPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
-            picturePreviewPanel.setOpaque(true);//设置不透明
-            panelSplitPane.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
-            panelSplitPane.setOpaque(true);//设置不透明
-            backgroundImagePanel = new BackgroundImagePanel(null, 0);//不设置背景图片
-        }
+        directoryTreeScrollPane.setBackground(SettingState.themeColor ? DARK_DIRECTORY_MAIN_COLOR : LIGHT_DIRECTORY_MAIN_COLOR);//设置背景
+        directoryTreeScrollPane.setOpaque(true);//设置不透明
+        directoryTreeScrollPane.getViewport().setBackground(SettingState.themeColor ? DARK_DIRECTORY_MAIN_COLOR : LIGHT_DIRECTORY_MAIN_COLOR);//设置背景
+        directoryTreeScrollPane.getViewport().setOpaque(true);//设置不透明
+        picturePreviewBottomBarPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景
+        picturePreviewBottomBarPanel.setOpaque(true);//设置不透明
+        picturePreviewMainPanelScrollPane.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
+        picturePreviewMainPanelScrollPane.setOpaque(true);//设置不透明
+        picturePreviewMainPanelScrollPane.getViewport().setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
+        picturePreviewMainPanelScrollPane.getViewport().setOpaque(true);//设置不透明
+        picturePreviewTopBarPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_BAR_COLOR : LIGHT_PICTURE_BAR_COLOR);//设置背景
+        picturePreviewTopBarPanel.setOpaque(true);//设置不透明
+        picturePreviewPanel.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
+        picturePreviewPanel.setOpaque(true);//设置不透明
+        panelSplitPane.setBackground(SettingState.themeColor ? DARK_PICTURE_MAIN_COLOR : LIGHT_PICTURE_MAIN_COLOR);//设置背景
+        panelSplitPane.setOpaque(true);//设置不透明
+        backgroundImagePanel = new BackgroundImagePanel(null, 0);//不设置背景图片
+
         backgroundImagePanel.setLayout(new BorderLayout());//设置布局
         backgroundImagePanel.add(panelSplitPane);//将分割条放入面板中
         backgroundImagePanel.add(bottomTipInformationPanel, BorderLayout.SOUTH);//把提示信息放到面板南部

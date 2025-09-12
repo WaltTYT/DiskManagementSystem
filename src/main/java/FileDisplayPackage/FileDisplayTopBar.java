@@ -193,17 +193,6 @@ public class FileDisplayTopBar {//图片预览顶部栏
             FileDisplayPopupMenu.openInOtherButton.setEnabled(true);
             FileDisplayPopupMenu.openInExplorerButton.setEnabled(true);
             FileDisplayPopupMenu.uploadToCloudButton.setEnabled(!Main.SettingState.userAccount.isEmpty());//还要根据用户是否登录设置是否可按下
-            if (size == 1) {//只有选中一张图片
-                FileDisplayPopupMenu.setPictureMenu.setEnabled(true);
-                FileDisplayPopupMenu.setPictureAsBackgroundPictureButton.setEnabled(true);
-                FileDisplayPopupMenu.setPictureAsLockscreenButton.setEnabled(true);
-                FileDisplayPopupMenu.setPictureAsWallpaperButton.setEnabled(true);
-            } else {//否则
-                FileDisplayPopupMenu.setPictureMenu.setEnabled(false);
-                FileDisplayPopupMenu.setPictureAsBackgroundPictureButton.setEnabled(false);
-                FileDisplayPopupMenu.setPictureAsLockscreenButton.setEnabled(false);
-                FileDisplayPopupMenu.setPictureAsWallpaperButton.setEnabled(false);
-            }
         } else {//否则
             cutButton.setEnabled(false);//设置不可选
             copyButton.setEnabled(false);
@@ -218,10 +207,6 @@ public class FileDisplayTopBar {//图片预览顶部栏
             FileDisplayPopupMenu.openInOtherButton.setEnabled(false);
             FileDisplayPopupMenu.openInExplorerButton.setEnabled(false);
             FileDisplayPopupMenu.uploadToCloudButton.setEnabled(false);
-            FileDisplayPopupMenu.setPictureMenu.setEnabled(false);
-            FileDisplayPopupMenu.setPictureAsBackgroundPictureButton.setEnabled(false);
-            FileDisplayPopupMenu.setPictureAsLockscreenButton.setEnabled(false);
-            FileDisplayPopupMenu.setPictureAsWallpaperButton.setEnabled(false);
         }
     }
 

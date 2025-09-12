@@ -1,9 +1,9 @@
 package DirectoryPackage;
 
-import MainPackage.Main;
-import NetworkPackage.User;
 import FileDisplayPackage.FileDisplayMainPanel;
 import FileDisplayPackage.FileDisplayTopBar;
+import MainPackage.Main;
+import NetworkPackage.User;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -18,17 +18,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static FileDisplayPackage.FileDisplayMainPanel.*;
+import static FileDisplayPackage.FileDisplayTopBar.*;
 import static MainPackage.Setting.*;
 import static MainPackage.ThemeColor.*;
 import static NetworkPackage.User.*;
-import static FileDisplayPackage.FileDisplayMainPanel.*;
-import static FileDisplayPackage.FileDisplayTopBar.*;
 
 public class DirectoryTree {//目录树类：采用懒加载方式，即只有打开文件夹时才对目录进行加载，极大优化程序
     public static JTree directoryTree;//目录树
     public static DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "Device" : "设备");//根结点
     public static DefaultMutableTreeNode computerNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "My Computer" : "我的电脑");//电脑结点
-    public static DefaultMutableTreeNode pictureNode;//图片结点
     public static DefaultMutableTreeNode cloudNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘");//云盘结点
 
     public static JWindow bottomTipWindow;//底部提示窗口
@@ -58,42 +57,15 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         roundRectangleBottomTipPanel.setLayout(new BorderLayout());//设置布局管理器
 
         rootNode.add(computerNode);//将我的电脑添加到根结点中
-        File[] roots = File.listRoots();//通过File类自带的listRoots方法获取该电脑所有磁盘根目录（盘符如C:\, D:\等）
-        Arrays.stream(roots).forEach(root -> {//遍历所有盘符创建子结点
-            DefaultMutableTreeNode driveNode = new DefaultMutableTreeNode(root);//创建盘符结点，存储对应的File对象
-            driveNode.add(new DefaultMutableTreeNode(new Placeholder()));//为所有盘符添加占位符结点用于触发懒加载（因设计为程序运行后显示根结点我的电脑和子结点盘符，所以只需要从盘符开始添加占位符结点即可）
-            computerNode.add(driveNode);//将盘符结点添加到根结点中
-        });
-
-        File picturesDir;//创建系统图片路径
-        if (!Main.SettingState.pictureDirectory.isEmpty()) {//如果拥有对图片路径的存档
-            picturesDir = new File(Main.SettingState.pictureDirectory);//就设置路径为存档路径
-            pictureNode = new DefaultMutableTreeNode(picturesDir);//是则创建图片结点
-            pictureNode.add(new DefaultMutableTreeNode(new Placeholder()));//也要为其添加占位符
-            rootNode.add(pictureNode);//将其添加到根结点中
-        } else {//否则
-            String userHome = System.getProperty("user.home");//获取用户主目录
-            String picturesSubdir = "Pictures";//获取系统图片子路径，优先检查Pictures（新版Windows）
-            picturesDir = new File(userHome + File.separator + picturesSubdir);//拼接得到系统图片文件夹
-            if (!picturesDir.exists()) {//如果该路径不存在
-                picturesSubdir = "My Pictures";//尝试My Pictures，旧版Windows可能使用此名称
-                picturesDir = new File(userHome + File.separator + picturesSubdir);//重新构造图片文件夹
-            }
-            if (picturesDir.exists() && picturesDir.isDirectory()) {//验证路径是否存在且路径是文件夹
-                pictureNode = new DefaultMutableTreeNode(picturesDir);//是则创建图片结点
-                pictureNode.add(new DefaultMutableTreeNode(new Placeholder()));//也要为其添加占位符
-                rootNode.add(pictureNode);//将其添加到根结点中
-                Main.SettingState.pictureDirectory = picturesDir.getAbsolutePath();//将图片地址存档
-            } else {//否则
-                if (Main.SettingState.utilizeTimes == 1) {//如果用户第一次使用，弹出菜单提示
-                    JOptionPane.showMessageDialog(null, Main.SettingState.systemLanguage ? "To Users Who Using For First Time: Unable To Found System Picture Folder Directory, Please Setting Manually" : "致第一次使用该软件的用户：无法获取您的系统图片文件夹路径，请前往设置手动更改", Main.SettingState.systemLanguage ? "Error" : "错误", JOptionPane.ERROR_MESSAGE);//报错
-                } else {//否则多次使用，只弹出底部信息提示
-                    createBottomTipWindow(Main.SettingState.systemLanguage ? "Unable To Found System Picture Folder Directory, Please Setting Manually" : "无法获取您的系统图片文件夹路径，请前往设置手动更改");//创建提示窗口
+        File[] roots = new File("D:/").listFiles();//通过File类自带的listFiles方法获取该电脑D盘根目录（采用D盘下的"C"、"D"等盘模拟磁盘根目录）
+        if (roots != null) {//如果不为空
+            Arrays.stream(roots).forEach(root -> {//遍历D盘创建子结点
+                if (root.getName().equals("C") || root.getName().equals("D") || root.getName().equals("E") || root.getName().equals("F") || root.getName().equals("G")) {//如果为盘符
+                    DefaultMutableTreeNode driveNode = new DefaultMutableTreeNode(root);//创建盘符结点，存储对应的File对象
+                    driveNode.add(new DefaultMutableTreeNode(new Placeholder()));//为所有盘符添加占位符结点用于触发懒加载（因设计为程序运行后显示根结点我的电脑和子结点盘符，所以只需要从盘符开始添加占位符结点即可）
+                    computerNode.add(driveNode);//将盘符结点添加到根结点中
                 }
-            }
-        }
-        if (!Main.SettingState.userAccount.isEmpty()) {//如果用户登录
-            rootNode.add(cloudNode);//将云盘结点添加到根结点中
+            });
         }
 
         directoryTree = new JTree(new DefaultTreeModel(rootNode));//通过树模型创建目录树
@@ -273,7 +245,6 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         private final Icon driveIcon = new ImageIcon("src/material/image/disk.png");//磁盘图标
         private final Icon folderOpenIcon = new ImageIcon("src/material/image/folderOpen.png");//文件夹图标
         private final Icon folderCloseIcon = new ImageIcon("src/material/image/folderClose.png");//文件夹图标
-        private final Icon pictureIcon = new ImageIcon("src/material/image/picture.png");//图片图标
         private final Icon cloudIcon = new ImageIcon("src/material/image/cloud.png");//云盘图标
 
         @Override
@@ -321,9 +292,6 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
             if (isDriveRoot(file)) {//如果是盘符根目录
                 setText(getDriveDisplayName(file));//显示盘符名称
                 setIcon(driveIcon);//设置磁盘图标
-            } else if (isPictureDirectory(file)) {//如果是图片目录
-                setText(file.getName());//显示图片目录名
-                setIcon(pictureIcon);//设置图片图标
             } else {//如果是普通目录
                 setText(file.getName());//显示目录名
                 setOpenIcon(folderOpenIcon);//设置打开状态图标
@@ -333,18 +301,14 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         }
 
         private boolean isDriveRoot(File file) {//判断是否为盘符根目录
-            return file.getPath().matches("^[A-Z]:\\\\$");//通过正则表达式判断是否是盘符+:+\
-        }
-
-        private boolean isPictureDirectory(File file) {//判断是否为图片目录
-            String[] split = file.getPath().split("\\\\");//截取绝对路径
-            return split[split.length - 1].matches(".*Pictures.*");//通过正则表达式判断文件名是否含Pictures
+            String filePath = file.getPath();//获取路径
+            return filePath.substring(filePath.indexOf("\\") + 1).matches("^[A-Z]$");//通过正则表达式判断是否是盘符
         }
 
         private String getDriveDisplayName(File drive) {//生成盘符显示名称
             String type = getDriveType(drive);//获取磁盘类型
-            String letter = drive.getPath().substring(0, 1);//获取盘符字母
-            return String.format("%s (%s)", type, letter);
+            String letter = drive.getPath().charAt(3) + ":";//获取盘符字母（因windows不可以加上:，所以要手动添加）
+            return String.format("%s (%s)", type, letter);//返回
         }
 
         private String getDriveType(File drive) {//判断磁盘类型
@@ -365,85 +329,13 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         if (fileList == null) return new File[0];//为空直接返回
         ArrayList<File> pictureList = new ArrayList<>();//创建一个集合列表用于返回
         for (File file : fileList) {//遍历列表
-            if (file == null || !file.isFile()) continue;//如果文件为空或文件不是文件就continue
-            if (detectPictureFileByMagicNumber(file)) {//如果列表中的文件是图片（采用一种检测方法）
-                pictureList.add(file);//就往集合列表中进行添加
+            if (file == null || !file.isFile()) {//如果文件为空或文件不是文件就continue
+                continue;
             }
+            pictureList.add(file);//否则就往集合列表中添加该文件
         }
         return pictureList.toArray(new File[0]);//再返回集合
     }
-
-//    private static boolean detectByExtension(File file) {//方法1：扩展名检测
-//        if (file == null || !file.isFile()) return false;//如果文件为空或文件不是文件就返回否
-//        String name = file.getName().toLowerCase();//获取文件名字，注意全部变成小写
-//        return name.endsWith(".jpg") || name.endsWith(".jpeg")//对结尾进行匹配
-//                || name.endsWith(".gif") || name.endsWith(".png")
-//                || name.endsWith(".bmp");
-//    }
-
-    public static boolean detectPictureFileByMagicNumber(File file) {//方法2：魔数检测
-        if (currentWorker != null && !currentWorker.isDone()) {//如果当前有任务
-            currentWorker.cancel(true);//取消未完成的任务
-        }
-        if (file == null || !file.isFile()) return false;//如果文件为空或文件不是文件就返回否
-        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))) {//根据文件创建文件输入流再转化成缓存输入流再转化成数据输入流
-            byte[] header = new byte[8];//创建文件前8位字节数组
-            int bytesRead = dis.read(header);//通过数据输入流读取文件前8位字节，返回一个int类型的数字,表示真是读取的有效字节数
-            return isJpegFile(header, bytesRead) || isPngFile(header, bytesRead) || isGifFile(header, bytesRead) || isBmpFile(header, bytesRead);//调用文件类型判断方法
-        } catch (IOException e) {
-            System.err.println("IOException:" + file.getAbsolutePath());//捕获异常
-            return false;//返回错误
-        }
-    }
-
-    private static boolean isJpegFile(byte[] header, int bytesRead) {//魔数检测辅助方法：判断是否为jpeg
-        return bytesRead >= 2//如果读取有效字节数超过2
-                && (header[0] & 0xFF) == 0xFF//第一个字节是十六进制的FF，以此类推
-                && (header[1] & 0xFF) == 0xD8;
-    }
-
-    private static boolean isPngFile(byte[] header, int bytesRead) {//魔数检测辅助方法：判断是否为png
-        return bytesRead >= 8
-                && header[0] == (byte) 0x89
-                && header[1] == 0x50
-                && header[2] == 0x4E
-                && header[3] == 0x47
-                && header[4] == 0x0D
-                && header[5] == 0x0A
-                && header[6] == 0x1A
-                && header[7] == 0x0A;
-    }
-
-    private static boolean isGifFile(byte[] header, int bytesRead) {//魔数检测辅助方法：判断是否为gif
-        return bytesRead >= 4
-                && header[0] == 'G'
-                && header[1] == 'I'
-                && header[2] == 'F'
-                && header[3] == '8';
-    }
-
-    private static boolean isBmpFile(byte[] header, int bytesRead) {//魔数检测辅助方法：判断是否为bmp
-        return bytesRead >= 2
-                && header[0] == 'B'
-                && header[1] == 'M';
-    }
-
-//    private static boolean detectByImageIO(File file) {//方法3：ImageIO检测
-//        if (file == null || !file.isFile()) return false;//如果文件为空或文件不是文件就返回否
-//        try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
-//            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
-//            if (readers.hasNext()) {
-//                ImageReader reader = readers.next();
-//                String format = reader.getFormatName().toUpperCase();
-//                return format.equals("JPEG") || format.equals("JPG")
-//                        || format.equals("PNG") || format.equals("GIF")
-//                        || format.equals("BMP");
-//            }
-//        } catch (IOException e) {
-//            return false;//f
-//        }
-//        return false;//没有检测到
-//    }
 
     public static void createBottomTipWindow(String tipInformation) {//创建屏幕下方提示信息
         if (bottomTipWindow != null) {//如果底部提示窗口不为空

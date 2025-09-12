@@ -41,10 +41,6 @@ public class FileDisplayPopupMenu {//图片预览右键弹出菜单
     public static JMenuItem openRecycleBinButton = new JMenuItem(Main.SettingState.systemLanguage ? "Open Image Recycle Bin (Ctrl + O)" : "打开图片回收站（Ctrl + O）");//打开图片回收站按钮（任何时候有效）
     public static JMenuItem emptyRecycleBinButton = new JMenuItem(Main.SettingState.systemLanguage ? "Empty Image Recycle Bin (Ctrl + E)" : "清空图片回收站（Ctrl + E）");//清空图片回收站按钮（任何时候有效）
     public static JMenuItem getPathButton = new JMenuItem(Main.SettingState.systemLanguage ? "Get Image Path (Ctrl + Shift + C)" : "获取图片路径（Ctrl + Shift + C）");//获取图片路径按钮（有选中图片时有效）
-    public static JMenu setPictureMenu = new JMenu(Main.SettingState.systemLanguage ? "Set Picture As" : "将图片设置为");//设置图片父级菜单项（选中图片为一时有效）
-    public static JMenuItem setPictureAsBackgroundPictureButton = new JMenuItem(Main.SettingState.systemLanguage ? "Background Picture (Ctrl + B)" : "背景图片（Ctrl + B）");//设置为背景图片按钮（选中图片为一时有效）
-    public static JMenuItem setPictureAsLockscreenButton = new JMenuItem(Main.SettingState.systemLanguage ? "Lock Screen (Ctrl + Q)" : "锁屏（Ctrl + Q）");//设置为锁屏按钮（选中图片为一时有效）
-    public static JMenuItem setPictureAsWallpaperButton = new JMenuItem(Main.SettingState.systemLanguage ? "Wall Paper (Ctrl + W)" : "壁纸（Ctrl + W）");//设置为壁纸按钮（选中图片为一时有效）
     public static JMenuItem uploadToCloudButton = new JMenuItem(Main.SettingState.systemLanguage ? "Upload Picture To Cloud (Ctrl + P)" : "上传图片至云端（Ctrl + P）");//上传图片至云端按钮（用户登录且云端未满且有选中图片）
 
     public FileDisplayPopupMenu() {//构造方法
@@ -70,13 +66,6 @@ public class FileDisplayPopupMenu {//图片预览右键弹出菜单
         rightMousePopupMenu.add(recycleBinMenu);
         rightMousePopupMenu.addSeparator();
         rightMousePopupMenu.add(getPathButton);
-        setPictureMenu.add(setPictureAsBackgroundPictureButton);
-        setPictureMenu.addSeparator();
-        setPictureMenu.add(setPictureAsLockscreenButton);
-        setPictureMenu.addSeparator();
-        setPictureMenu.add(setPictureAsWallpaperButton);
-        rightMousePopupMenu.addSeparator();
-        rightMousePopupMenu.add(setPictureMenu);
         rightMousePopupMenu.addSeparator();
         rightMousePopupMenu.add(uploadToCloudButton);
 
@@ -88,10 +77,6 @@ public class FileDisplayPopupMenu {//图片预览右键弹出菜单
         openInOtherButton.setEnabled(false);
         openInExplorerButton.setEnabled(false);
         getPathButton.setEnabled(false);
-        setPictureMenu.setEnabled(false);
-        setPictureAsBackgroundPictureButton.setEnabled(false);
-        setPictureAsLockscreenButton.setEnabled(false);
-        setPictureAsWallpaperButton.setEnabled(false);
         uploadToCloudButton.setEnabled(false);
 
         cutButton.addActionListener(_ -> handleCut());//处理剪切
@@ -105,16 +90,6 @@ public class FileDisplayPopupMenu {//图片预览右键弹出菜单
         openRecycleBinButton.addActionListener(_ -> handleOpenRecycleBin());//处理打开图片回收站
         emptyRecycleBinButton.addActionListener(_ -> handleEmptyRecycleBin());//处理清空图片回收站
         getPathButton.addActionListener(_ -> handleGetPath());//处理获取路径
-        setPictureAsBackgroundPictureButton.addActionListener(_ -> {
-            if (Objects.equals(currentFolder, Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果在云盘结点设置
-                Main.SettingState.backgroundPictureDirectory = "My Cloud\\" + selectionThumbnailItemList.getFirst().getFile().getName();//记录
-            } else {//否则
-                Main.SettingState.backgroundPictureDirectory = selectionThumbnailItemList.getFirst().getFile().getAbsolutePath();//记录
-            }
-            Setting.initTransparentBackground();//初始化透明背景图片
-        });//处理设置为背景图片
-        setPictureAsLockscreenButton.addActionListener(_ -> handleSetAsLockscreen());//处理设置为锁屏
-        setPictureAsWallpaperButton.addActionListener(_ -> handleSetAsWallpaper());//处理设置为壁纸
         uploadToCloudButton.addActionListener(_ -> {
             handleUserSaveUserUploadPicture(getSelectionThumbnailItemFileList(), true);//处理上传图片至云端
             handleRefresh();//刷新

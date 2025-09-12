@@ -524,11 +524,6 @@ public class User {//用户类
             FileDisplayPopupMenu.handleAutoEmptyRecycleBin();//调用自动清空图片回收站
         }
 
-        if (!Main.SettingState.backgroundPictureDirectory.isEmpty()) {//如果背景图片路径不为空
-            Setting.initTransparentBackground();//初始化透明背景
-        } else {//否则
-            Setting.disposeTransparentBackground();//释放背景图片
-        }
         closeUserSocket();//关闭连接
     }
 
