@@ -228,7 +228,7 @@ public class Setting {//设置类
         mainPanel.setFocusable(focusable);
         FileDisplayBottomBar.undoButton.setFocusable(focusable);
         FileDisplayBottomBar.redoButton.setFocusable(focusable);
-        FileDisplayBottomBar.slideButton.setFocusable(focusable);
+        FileDisplayBottomBar.editButton.setFocusable(focusable);
         FileDisplayBottomBar.userButton.setFocusable(focusable);
         FileDisplayBottomBar.uploadToCloudButton.setFocusable(focusable);
         FileDisplayBottomBar.settingButton.setFocusable(focusable);
@@ -510,8 +510,6 @@ public class Setting {//设置类
         FileDisplayPopupMenu.renameButton.setText(systemLanguage ? "Rename (F2)" : "重命名（F2）");//重命名按钮（选中图片为一时有效）
         FileDisplayPopupMenu.removeButton.setText(systemLanguage ? "Delete (Delete)" : "删除（Delete）");//删除按钮（有选中图片时有效）
         FileDisplayPopupMenu.refreshButton.setText(systemLanguage ? "Refresh (F5)" : "刷新（F5）");//刷新按钮（任何时候有效）
-        FileDisplayPopupMenu.openInOtherButton.setText(systemLanguage ? "Open Image In Other (Enter)" : "在其他软件中打开（Enter）");//在其他软件中打开按钮（有选中图片时有效）
-        FileDisplayPopupMenu.openInExplorerButton.setText(systemLanguage ? "Open Image In Explorer (Ctrl + Enter)" : "在资源管理器中打开（Ctrl + Enter）");//在资源管理器中打开按钮（有选中图片时有效）
         FileDisplayPopupMenu.recycleBinMenu.setText(systemLanguage ? "Picture Recycle Bin" : "图片回收站");//图片回收站父级菜单项（任何时候有效）
         FileDisplayPopupMenu.openRecycleBinButton.setText(systemLanguage ? "Open Image Recycle Bin (Ctrl + O)" : "打开图片回收站（Ctrl + O）");//打开图片回收站按钮（任何时候有效）
         FileDisplayPopupMenu.emptyRecycleBinButton.setText(systemLanguage ? "Empty Image Recycle Bin (Ctrl + E)" : "清空图片回收站（Ctrl + E）");//清空图片回收站按钮（任何时候有效）

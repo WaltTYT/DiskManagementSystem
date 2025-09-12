@@ -51,7 +51,7 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
     public static JPanel fileDisplayPanel;//文件展示面板
     public static JSplitPane panelSplitPane;//面板分割
     public static JFrame diskManagementSystemFrame;//磁盘管理系统窗口
-    public static JFrame slideFrame;//幻灯片窗口
+    public static JFrame editFrame;//幻灯片窗口
 
     public static final JPanel bottomTipInformationPanel = new JPanel();//底部提示信息面板
     public static final JTextArea bottomTipInformation = new JTextArea();//底部提示信息文本域
@@ -210,7 +210,7 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
         fileDisplayPanel = new JPanel(new BorderLayout());//创建图片预览面板，使用BorderLayout布局管理器
         panelSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, directoryTreeScrollPane, fileDisplayPanel);//创建目录树滚动条和图片预览面板之间的分割
         diskManagementSystemFrame = new JFrame(SettingState.systemLanguage ? "Disk Management System" : "磁盘管理系统");//创建磁盘管理系统窗口
-        slideFrame = new JFrame();//创建幻灯片窗口
+        editFrame = new JFrame();//创建幻灯片窗口
 
         directoryTreeScrollPane.getVerticalScrollBar().setUnitIncrement(25);//设置垂直滚动条滚动长度
         directoryTreeScrollPane.getHorizontalScrollBar().setUnitIncrement(5);//设置水平滚动条滚动长度
@@ -337,7 +337,7 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
                     Setting.tutorialWindow.setVisible(true);//让窗口可见
                 }
 
-                if (isNotSlide) {//如果不是播放幻灯片
+                if (isNotEdit) {//如果不是播放幻灯片
                     try {
                         Robot robot = new Robot();//创建Robot对象切换输入法
                         robot.keyPress(KeyEvent.VK_CONTROL);//按下ctrl
@@ -378,7 +378,7 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
                         }
                     }
                 } else {//否则是播放幻灯片
-                    isNotSlide = true;//停止播放幻灯片
+                    isNotEdit = true;//停止播放幻灯片
                 }
             }
 
@@ -464,19 +464,19 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
             }
         });
 
-        slideFrame.setLayout(new BorderLayout());//设置布局
-        slideFrame.add(picturePanel, BorderLayout.NORTH);//添加到北部
-        slideFrame.add(scrollPane, BorderLayout.CENTER);//添加到中心
-        slideFrame.add(toolBarPanel, BorderLayout.SOUTH);//添加到南部
-        slideFrame.setSize(screenSize.width, screenSize.height);//设置窗口大小为当前电脑分辨率
-        slideFrame.setAutoRequestFocus(true);//自动请求焦点
+        editFrame.setLayout(new BorderLayout());//设置布局
+        editFrame.add(picturePanel, BorderLayout.NORTH);//添加到北部
+        editFrame.add(scrollPane, BorderLayout.CENTER);//添加到中心
+        editFrame.add(toolBarPanel, BorderLayout.SOUTH);//添加到南部
+        editFrame.setSize(screenSize.width, screenSize.height);//设置窗口大小为当前电脑分辨率
+        editFrame.setAutoRequestFocus(true);//自动请求焦点
         try {
-            slideFrame.setIconImage(ImageIO.read(new File("src/material/image/slide.png")));//设置窗口图标
+            editFrame.setIconImage(ImageIO.read(new File("src/material/image/slide.png")));//设置窗口图标
         } catch (IOException e) {
             handleErrorLog(e.getMessage());//处理错误日志
             throw new RuntimeException(e);//捕获异常
         }
-        slideFrame.addWindowFocusListener(new WindowFocusListener() {//如果发生窗口聚焦事件
+        editFrame.addWindowFocusListener(new WindowFocusListener() {//如果发生窗口聚焦事件
             @Override
             public void windowGainedFocus(WindowEvent e) {//如果窗口获得聚焦
                 try {
@@ -498,7 +498,7 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
             public void windowLostFocus(WindowEvent e) {//被迫重写
             }
         });
-        slideFrame.addWindowListener(new WindowAdapter() {//为幻灯片窗口添加窗口监听
+        editFrame.addWindowListener(new WindowAdapter() {//为幻灯片窗口添加窗口监听
             @Override
             public void windowClosing(WindowEvent e) {//如果正在关闭
                 if (bottomTipWindow != null && bottomTipWindow.isVisible()) {//如果底部提示窗口不为空
@@ -519,7 +519,7 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
                 slideCache.clear();//清空缓存
             }
         });
-        JRootPane slideFrameRoot = slideFrame.getRootPane();//获取窗口的根
+        JRootPane slideFrameRoot = editFrame.getRootPane();//获取窗口的根
         slideFrameRoot.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "closeFullscreen");//为根设置关闭窗口全屏ESC按键绑定
         slideFrameRoot.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), "toggleFullscreen");//为根设置切换窗口全屏F11按键绑定
         slideFrameRoot.getActionMap().put("closeFullscreen", new AbstractAction() {//当ESC执行时
@@ -566,7 +566,7 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
 
     public static void closeSlideFrameFullscreen() {//关闭幻灯片窗口全屏
         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);//取消窗口全屏
-        slideFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
+        editFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
         SettingState.windowState = false;//更新
         Setting.displayTitleRadioButton.setSelected(true);//选中
         Setting.settingDialog.setAlwaysOnTop(false);//设置不永远在最上层
@@ -578,19 +578,19 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
             User.userDialog.setAlwaysOnTop(false);//设置不永远在最上层
         }
         if (!FileEditToolBar.isScrollPaneHide) {//如果滚动栏没有隐藏
-            Main.slideFrame.add(scrollPane);//添加滚动栏
+            Main.editFrame.add(scrollPane);//添加滚动栏
             imageHeight -= 118;//更新图片高度
         }
-        slideFrame.add(toolBarPanel, BorderLayout.SOUTH);//添加工具栏面板
+        editFrame.add(toolBarPanel, BorderLayout.SOUTH);//添加工具栏面板
         picturePanel.setPreferredSize(new Dimension(Main.screenSize.width, FileEditToolBar.isScrollPaneHide ? PANEL_DEFAULT_HEIGHT + 118 : PANEL_DEFAULT_HEIGHT));//设置大小
         imageHeight -= 57;//更新图片高度
         updatePicturePanel();//更新图片面板
-        Main.slideFrame.revalidate();//重新验证布局
-        Main.slideFrame.repaint();//重新绘制
+        Main.editFrame.revalidate();//重新验证布局
+        Main.editFrame.repaint();//重新绘制
     }
 
     public static void openSlideFrameFullscreen() {//开启幻灯片窗口全屏
-        GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(slideFrame);//设置窗口全屏
+        GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(editFrame);//设置窗口全屏
         SettingState.windowState = true;//更新
         createBottomTipWindow(SettingState.systemLanguage ? "Press ESC Or F11 To Exit Fullscreen" : "按下 ESC 或 F11 即可退出全屏");//提示
         Setting.hideTitleRadioButton.setSelected(true);//选中
@@ -603,15 +603,15 @@ public class Main {//主类 TODO 加载FAT 双击节点行为
             User.userDialog.setAlwaysOnTop(true);//设置永远在最上层
         }
         if (!FileEditToolBar.isScrollPaneHide) {//如果滚动栏没有隐藏
-            Main.slideFrame.remove(scrollPane);//移除滚动栏
+            Main.editFrame.remove(scrollPane);//移除滚动栏
             imageHeight += 118;//更新图片高度
         }
-        slideFrame.remove(toolBarPanel);//移除工具栏面板
+        editFrame.remove(toolBarPanel);//移除工具栏面板
         picturePanel.setPreferredSize(new Dimension(Main.screenSize.width, PANEL_FULLSCREEN_HEIGHT));//设置大小
         imageHeight += 57;//更新图片高度
         updatePicturePanel();//更新图片面板
-        Main.slideFrame.revalidate();//重新验证布局
-        Main.slideFrame.repaint();//重新绘制
+        Main.editFrame.revalidate();//重新验证布局
+        Main.editFrame.repaint();//重新绘制
     }
 
     public static class BackgroundImagePanel extends JPanel {//自定义背景图片面板

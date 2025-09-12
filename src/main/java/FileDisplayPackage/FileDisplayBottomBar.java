@@ -33,7 +33,7 @@ public class FileDisplayBottomBar {//文件展示底部栏
     public static final JPanel bottomBarPanel = new JPanel();//底部面板：用于放置按钮等组件
     public static final JButton undoButton = new JButton();//撤销按钮
     public static final JButton redoButton = new JButton();//恢复按钮
-    public static final JButton slideButton = new JButton();//幻灯片按钮
+    public static final JButton editButton = new JButton();//编辑按钮（当前选中文件为一个且文件非目录时可选中）
     public static final JButton userButton = new JButton();//用户按钮
     public static final JButton uploadToCloudButton = new JButton();//上传图片至云端按钮
     public static final JButton settingButton = new JButton();//设置按钮
@@ -84,26 +84,19 @@ public class FileDisplayBottomBar {//文件展示底部栏
     public FileDisplayBottomBar() {//构造方法
         undoButton.setEnabled(false);//初始无效
         redoButton.setEnabled(false);
-        slideButton.setEnabled(false);
+        editButton.setEnabled(false);
         uploadToCloudButton.setEnabled(false);
 
         undoButton.setSize(24, 24);//设置大小
         redoButton.setSize(24, 24);
-        slideButton.setSize(24, 24);
+        editButton.setSize(24, 24);
         userButton.setSize(24, 24);
         uploadToCloudButton.setSize(24, 24);
         settingButton.setSize(24, 24);
 
-//        undoButton.setBackground(BAR_BUTTON_COLOR);//设置背景颜色
-//        redoButton.setBackground(BAR_BUTTON_COLOR);
-//        slideButton.setBackground(BAR_BUTTON_COLOR);
-//        userButton.setBackground(BAR_BUTTON_COLOR);
-//        uploadToCloudButton.setBackground(BAR_BUTTON_COLOR);
-//        settingButton.setBackground(BAR_BUTTON_COLOR);
-
         undoButton.setIcon(new ImageIcon(new ImageIcon("src/material/image/quash.png").getImage().getScaledInstance(undoButton.getWidth(), undoButton.getHeight(), Image.SCALE_DEFAULT)));//通过getScaledInstance使按钮适应图片大小
         redoButton.setIcon(new ImageIcon(new ImageIcon("src/material/image/recover.png").getImage().getScaledInstance(redoButton.getWidth(), redoButton.getHeight(), Image.SCALE_DEFAULT)));
-        slideButton.setIcon(new ImageIcon(new ImageIcon("src/material/image/slide.png").getImage().getScaledInstance(slideButton.getWidth(), slideButton.getHeight(), Image.SCALE_DEFAULT)));
+        editButton.setIcon(new ImageIcon(new ImageIcon("src/material/image/edit.png").getImage().getScaledInstance(editButton.getWidth(), editButton.getHeight(), Image.SCALE_DEFAULT)));
         userButton.setIcon(new ImageIcon(new ImageIcon("src/material/image/user.png").getImage().getScaledInstance(userButton.getWidth(), userButton.getHeight(), Image.SCALE_DEFAULT)));
         uploadToCloudButton.setIcon(new ImageIcon(new ImageIcon("src/material/image/uploadToCloud.png").getImage().getScaledInstance(uploadToCloudButton.getWidth(), uploadToCloudButton.getHeight(), Image.SCALE_DEFAULT)));
         settingButton.setIcon(new ImageIcon(new ImageIcon("src/material/image/setting.png").getImage().getScaledInstance(settingButton.getWidth(), settingButton.getHeight(), Image.SCALE_DEFAULT)));
@@ -112,7 +105,7 @@ public class FileDisplayBottomBar {//文件展示底部栏
 
         bottomBarPanel.add(undoButton);
         bottomBarPanel.add(redoButton);
-        bottomBarPanel.add(slideButton);
+        bottomBarPanel.add(editButton);
         bottomBarPanel.add(userButton);
         bottomBarPanel.add(uploadToCloudButton);
         bottomBarPanel.add(settingButton);
@@ -168,12 +161,12 @@ public class FileDisplayBottomBar {//文件展示底部栏
             }
         });
 
-        slideButton.addActionListener(_ -> handleSlide());//为幻灯片按钮添加事件监听
-        slideButton.addMouseListener(new MouseAdapter() {//为幻灯片按钮添加鼠标事件监听
+        editButton.addActionListener(_ -> handleEdit());//为编辑按钮添加事件监听
+        editButton.addMouseListener(new MouseAdapter() {//为幻灯片按钮添加鼠标事件监听
 
             @Override
             public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow(Main.SettingState.systemLanguage ? "Turn On Slide (Ctrl + D)" : "开启幻灯片（Ctrl + D）", slideButton));//展示提示窗口（鼠标悬浮一秒后展示）
+                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow(Main.SettingState.systemLanguage ? "Edit File (Ctrl + D)" : "编辑文件（Ctrl + D）", editButton));//展示提示窗口（鼠标悬浮一秒后展示）
                 hoverTimer.setRepeats(false);//设置计时器不重复
                 hoverTimer.start();//开始计时
             }
@@ -585,18 +578,18 @@ public class FileDisplayBottomBar {//文件展示底部栏
         }).start();//开始计时器
     }
 
-    public static void handleSlide() {//处理幻灯片
-        FileEditPanel.isNotSlide = false;//播放幻灯片
+    public static void handleEdit() {//处理幻灯片
+        FileEditPanel.isNotEdit = false;//播放幻灯片
         if (itemHoverTipWindow != null) {//如果提示信息不为空
             itemHoverTipWindow.dispose();//释放提示信息
             itemHoverTipWindow = null;//提示信息置空
         }
         Main.diskManagementSystemFrame.setVisible(false);//不可见
-        Main.slideFrame.setVisible(true);//可见
+        Main.editFrame.setVisible(true);//可见
         if (Main.SettingState.windowState) {//如果全屏
-            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(Main.slideFrame);//设置窗口全屏
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(Main.editFrame);//设置窗口全屏
         } else {//否则
-            Main.slideFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
+            Main.editFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);//设置窗口直接最大化
         }
 
         FileEditScrollPane.pictureIndex = FileDisplayMainPanel.selectionAnchorIndex == -1 ? 0 : FileDisplayMainPanel.selectionAnchorIndex;//设置索引

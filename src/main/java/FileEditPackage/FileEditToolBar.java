@@ -612,22 +612,22 @@ public class FileEditToolBar {//幻灯片工具栏类
         }
         if (isScrollPaneHide) {//如果隐藏滚动栏
             isScrollPaneHide = false;//展示滚动栏
-            Main.slideFrame.add(scrollPane);//添加滚动栏
+            Main.editFrame.add(scrollPane);//添加滚动栏
             picturePanel.setPreferredSize(new Dimension(Main.screenSize.width, Main.SettingState.windowState ? PANEL_FULLSCREEN_HEIGHT : PANEL_DEFAULT_HEIGHT));//设置大小
             imageHeight -= 118;//更新图片高度
             updatePicturePanel();//更新图片面板
-            Main.slideFrame.revalidate();//重新验证布局
-            Main.slideFrame.repaint();//重新绘制
+            Main.editFrame.revalidate();//重新验证布局
+            Main.editFrame.repaint();//重新绘制
             scrollPaneStrategyButton.setIcon(new ImageIcon("src/material/image/showScrollPane.png"));//设置图标为展示滚动栏
             hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow(Main.SettingState.systemLanguage ? "Hide Picture Scroll Pane (F)" : "隐藏图片滚动栏（F）", scrollPaneStrategyButton));//展示提示窗口（鼠标悬浮一秒后展示）
         } else {//否则
             isScrollPaneHide = true;//隐藏滚动栏
-            Main.slideFrame.remove(scrollPane);//移除滚动栏
+            Main.editFrame.remove(scrollPane);//移除滚动栏
             picturePanel.setPreferredSize(new Dimension(Main.screenSize.width, Main.SettingState.windowState ? PANEL_FULLSCREEN_HEIGHT + 118 : PANEL_DEFAULT_HEIGHT + 118));//设置大小
             imageHeight += 118;//更新图片高度
             updatePicturePanel();//更新图片面板
-            Main.slideFrame.revalidate();//重新验证布局
-            Main.slideFrame.repaint();//重新绘制
+            Main.editFrame.revalidate();//重新验证布局
+            Main.editFrame.repaint();//重新绘制
             scrollPaneStrategyButton.setIcon(new ImageIcon("src/material/image/hideScrollPane.png"));//设置图标为隐藏滚动栏
             hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow(Main.SettingState.systemLanguage ? "Show Picture Scroll Pane (F)" : "展示图片滚动栏（F）", scrollPaneStrategyButton));//展示提示窗口（鼠标悬浮一秒后展示）
         }

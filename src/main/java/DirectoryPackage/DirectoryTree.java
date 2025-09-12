@@ -23,22 +23,13 @@ import static FileDisplayPackage.FileDisplayMainPanel.*;
 import static FileDisplayPackage.FileDisplayTopBar.*;
 import static MainPackage.Setting.*;
 import static MainPackage.ThemeColor.*;
-import static MainPackage.ThemeColor.DARK_DIRECTORY_BACKGROUND_NON_SELECTION_COLOR;
-import static MainPackage.ThemeColor.DARK_DIRECTORY_BACKGROUND_SELECTION_COLOR;
-import static MainPackage.ThemeColor.DARK_DIRECTORY_BORDER_SELECTION_COLOR;
-import static MainPackage.ThemeColor.DARK_DIRECTORY_TEXT_NON_SELECTION_COLOR;
-import static MainPackage.ThemeColor.DARK_DIRECTORY_TEXT_SELECTION_COLOR;
-import static MainPackage.ThemeColor.LIGHT_DIRECTORY_BACKGROUND_NON_SELECTION_COLOR;
-import static MainPackage.ThemeColor.LIGHT_DIRECTORY_BACKGROUND_SELECTION_COLOR;
-import static MainPackage.ThemeColor.LIGHT_DIRECTORY_BORDER_SELECTION_COLOR;
-import static MainPackage.ThemeColor.LIGHT_DIRECTORY_TEXT_NON_SELECTION_COLOR;
-import static MainPackage.ThemeColor.LIGHT_DIRECTORY_TEXT_SELECTION_COLOR;
 import static NetworkPackage.User.*;
 
 public class DirectoryTree {//目录树类：采用懒加载方式，即只有打开文件夹时才对目录进行加载，极大优化程序
     public static JTree directoryTree;//目录树
     public static DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "Device" : "设备");//根结点
     public static DefaultMutableTreeNode computerNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "My Computer" : "我的电脑");//电脑结点
+    public static DefaultMutableTreeNode recycleBinNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "Recycle Bin" : "回收站");//回收站结点
     public static DefaultMutableTreeNode cloudNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘");//云盘结点
 
     public static JWindow bottomTipWindow;//底部提示窗口
@@ -71,7 +62,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         File[] roots = new File("D:/").listFiles();//通过File类自带的listFiles方法获取该电脑D盘根目录（采用D盘下的"C"、"D"等盘模拟磁盘根目录）
         if (roots != null) {//如果不为空
             Arrays.stream(roots).forEach(root -> {//遍历D盘创建子结点
-                if (root.getName().equals("C") || root.getName().equals("D") || root.getName().equals("E") || root.getName().equals("F") || root.getName().equals("G")) {//如果为盘符
+                if (root.getName().equals("C") || root.getName().equals("D") || root.getName().equals("E") || root.getName().equals("F") || root.getName().equals("G") || root.getName().equals("Recycle Bin")) {//如果为盘符或回收站
                     DefaultMutableTreeNode driveNode = new DefaultMutableTreeNode(root);//创建盘符结点，存储对应的File对象
                     driveNode.add(new DefaultMutableTreeNode(new Placeholder()));//为所有盘符添加占位符结点用于触发懒加载（因设计为程序运行后显示根结点我的电脑和子结点盘符，所以只需要从盘符开始添加占位符结点即可）
                     computerNode.add(driveNode);//将盘符结点添加到根结点中
@@ -256,6 +247,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
         private final Icon driveIcon = new ImageIcon("src/material/image/disk.png");//磁盘图标
         private final Icon folderOpenIcon = new ImageIcon("src/material/image/folderOpen.png");//文件夹打开图标
         private final Icon folderCloseIcon = new ImageIcon("src/material/image/folderClose.png");//文件夹关闭图标
+        private final Icon recycleBinIcon = new ImageIcon("src/material/image/recycleBin.png");//回收站图标
         private final Icon cloudIcon = new ImageIcon("src/material/image/cloud.png");//云盘图标
 
         @Override
@@ -295,6 +287,9 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
             if (isDriveRoot(file)) {//如果是盘符根目录
                 setText(getDriveDisplayName(file));//显示盘符名称
                 setIcon(driveIcon);//设置磁盘图标
+            } else if (isRecycleBin(file)) {//如果是回收站结点
+                setText(Main.SettingState.systemLanguage ? "Recycle Bin" : "回收站");//设置显示文本
+                setIcon(recycleBinIcon);//设置回收站图标
             } else {//如果是普通目录
                 setText(file.getName());//显示目录名
                 setOpenIcon(folderOpenIcon);//设置打开状态图标
@@ -308,9 +303,14 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
             return filePath.substring(filePath.indexOf("\\") + 1).matches("^[A-Z]$");//通过正则表达式判断是否是盘符
         }
 
+        private boolean isRecycleBin(File file) {//判断是否为回收站目录
+            String filePath = file.getPath();//获取路径
+            return filePath.substring(filePath.indexOf("\\") + 1).matches("Recycle Bin");//判断是否是回收站
+        }
+
         private String getDriveDisplayName(File drive) {//生成盘符显示名称
             String type = getDriveType(drive);//获取磁盘类型
-            String letter = drive.getPath().charAt(3) + ":";//获取盘符字母（因windows不可以加上:，所以要手动添加）
+            String letter = drive.getPath().substring(3);//获取盘符字母
             return String.format("%s (%s)", type, letter);//返回
         }
 
@@ -345,8 +345,8 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
             bottomTipWindow.dispose();//释放底部提示窗口
             bottomTipWindow = null;//底部提示窗口置空
         }
-        if (Main.slideFrame != null && Main.slideFrame.isVisible()) {//如果当前在幻灯片窗口
-            bottomTipWindow = new JWindow(Main.slideFrame);//创建提示窗口（设置父组件防止覆盖）
+        if (Main.editFrame != null && Main.editFrame.isVisible()) {//如果当前在幻灯片窗口
+            bottomTipWindow = new JWindow(Main.editFrame);//创建提示窗口（设置父组件防止覆盖）
         } else {//否则
             if (insertImageDialog.isVisible()) {//如果插入图片窗口可见
                 bottomTipWindow = new JWindow(insertImageDialog);//创建提示窗口（设置父组件防止覆盖）

@@ -44,7 +44,7 @@ public class FileEditPanel {//幻灯片图片面板类
     public static final JButton nextButton = new TransparentButton();//下一张按钮
 
     public static SlideItem currentSlideItem = null;//当前幻灯片项目
-    public static boolean isNotSlide = true;//是否播放幻灯片
+    public static boolean isNotEdit = true;//是否播放幻灯片
     public static int imageHeight = Main.screenSize.height - 176;//图片高度
     public static int originalWidth;//图片原始宽度
     public static int originalHeight;//图片原始高度
@@ -124,7 +124,7 @@ public class FileEditPanel {//幻灯片图片面板类
         currentSlideItem.add(nextButton);//添加下一张图片按钮
 
         File file = currentSlideItem.getFile();//获取文件
-        Main.slideFrame.setTitle(file.getName());//设置标题为文件名
+        Main.editFrame.setTitle(file.getName());//设置标题为文件名
         informationLabel.setText(new StringBuilder().append(originalWidth).append("×").append(originalHeight).append(" - ").append(calculateItemHoverTipFileSize(file.length())).append(" - ").append(new SimpleDateFormat("yyyy-MM-dd").format(new Date(file.lastModified()))).append(" - ").append(pictureIndex + 1).append("/").append(scrollItemList.size()).toString());//设置信息标签文本
 
         if (currentSlideItem.isNotGIF()) {//如果不是GIF

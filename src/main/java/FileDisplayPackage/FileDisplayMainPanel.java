@@ -66,10 +66,10 @@ public class FileDisplayMainPanel {//文件展示主面板类
     public static int thumbnailItemWidth = 300;//缩略图宽度
     private static int totalFiles;//总共应处理文件数目
     private static int processedFiles;//已处理文件数目
-    public static boolean loading = false;//图像是否在加载
+    public static boolean loading = false;//文件是否在加载
     private static boolean dragging = false;//是否发生拖动（用于在鼠标松开时判断是否发生了拖动）
     public static int selectionAnchorIndex = -1;//锚点索引（用于保存选中项目，方便shift+点击进行调用）
-    private static double fileTotalKiloByte = 0.0;//该文件夹中图片总大小（因图片大小一般都有1KB，所以设置基本单位为1KB）
+    private static double fileTotalKiloByte = 0.0;//该文件夹中文件总大小（设置基本单位为1KB）
     private static Point selectionStart;//鼠标框选起点
     private static final Rectangle selectionRect = new Rectangle();//鼠标框选矩形
     public static SortType currentSortType = SortType.ANAME;//当前排序方式，默认为名称排序
@@ -329,17 +329,13 @@ public class FileDisplayMainPanel {//文件展示主面板类
         bindKey(inputMap, actionMap, KeyEvent.VK_F, CTRL_DOWN_MASK, "search");//搜索
         bindKey(inputMap, actionMap, KeyEvent.VK_Z, CTRL_DOWN_MASK, "undo");//撤销
         bindKey(inputMap, actionMap, KeyEvent.VK_Y, CTRL_DOWN_MASK, "redo");//恢复
-        bindKey(inputMap, actionMap, KeyEvent.VK_D, CTRL_DOWN_MASK, "slide");//幻灯片
+        bindKey(inputMap, actionMap, KeyEvent.VK_D, CTRL_DOWN_MASK, "edit");//编辑
         bindKey(inputMap, actionMap, KeyEvent.VK_U, CTRL_DOWN_MASK, "user");//用户
         bindKey(inputMap, actionMap, KeyEvent.VK_P, CTRL_DOWN_MASK, "uploadToCloud");//上传到云盘
         bindKey(inputMap, actionMap, KeyEvent.VK_S, CTRL_DOWN_MASK, "setting");//设置
         bindKey(inputMap, actionMap, KeyEvent.VK_C, CTRL_DOWN_MASK + SHIFT_DOWN_MASK, "getPath");//获取路径
-        bindKey(inputMap, actionMap, KeyEvent.VK_ENTER, CTRL_DOWN_MASK, "openInExplorer");//在资源管理器打开
         bindKey(inputMap, actionMap, KeyEvent.VK_O, CTRL_DOWN_MASK, "openRecycleBin");//打开回收站
         bindKey(inputMap, actionMap, KeyEvent.VK_E, CTRL_DOWN_MASK, "emptyRecycleBin");//清空回收站
-        bindKey(inputMap, actionMap, KeyEvent.VK_B, CTRL_DOWN_MASK, "setAsBackground");//设为背景图片
-        bindKey(inputMap, actionMap, KeyEvent.VK_Q, CTRL_DOWN_MASK, "setAsLockscreen");//设为锁屏
-        bindKey(inputMap, actionMap, KeyEvent.VK_W, CTRL_DOWN_MASK, "setAsWallpaper");//设为壁纸
         bindKey(inputMap, actionMap, KeyEvent.VK_M, CTRL_DOWN_MASK + SHIFT_DOWN_MASK, "muteMaster");//静音总音量
         bindKey(inputMap, actionMap, KeyEvent.VK_P, CTRL_DOWN_MASK + SHIFT_DOWN_MASK, "muteMusic");//静音音乐
         bindKey(inputMap, actionMap, KeyEvent.VK_E, CTRL_DOWN_MASK + SHIFT_DOWN_MASK, "muteSoundEffect");//静音音乐
@@ -404,9 +400,9 @@ public class FileDisplayMainPanel {//文件展示主面板类
                     handleRedo();//调用恢复
                 }
                 break;
-            case "slide":
-                if (slideButton.isEnabled()) {//如果幻灯片按钮有效
-                    handleSlide();//调用幻灯片
+            case "edit":
+                if (editButton.isEnabled()) {//如果编辑按钮有效
+                    handleEdit();//调用编辑
                 }
                 break;
             case "user":
@@ -422,23 +418,11 @@ public class FileDisplayMainPanel {//文件展示主面板类
             case "getPath":
                 FileDisplayPopupMenu.handleGetPath();//调用获取路径
                 break;
-            case "openInOther":
-                FileDisplayPopupMenu.handleOpenInOther();//调用在其他软件打开
-                break;
-            case "openInExplorer":
-                FileDisplayPopupMenu.handleOpenInExplorer();//调用在资源管理器打开
-                break;
             case "openRecycleBin":
                 FileDisplayPopupMenu.handleOpenRecycleBin();//调用打开回收站
                 break;
             case "emptyRecycleBin":
                 FileDisplayPopupMenu.handleEmptyRecycleBin();//调用清空回收站
-                break;
-            case "setAsLockscreen":
-                FileDisplayPopupMenu.handleSetAsLockscreen();//调用设置为锁屏
-                break;
-            case "setAsWallpaper":
-                FileDisplayPopupMenu.handleSetAsWallpaper();//调用设置为壁纸
                 break;
 
             case "scrollPaneStrategy":
@@ -597,7 +581,7 @@ public class FileDisplayMainPanel {//文件展示主面板类
         public void mouseWheelMoved(MouseWheelEvent e) {//如果鼠标滚动
             if (e.isControlDown()) {//如果ctrl键被按下
                 if (loading) {//如果图像仍在加载
-                    createBottomTipWindow(Main.SettingState.systemLanguage ? "Image Loading, Please Waiting To Scaling" : "图片正在加载，请等待图片加载完成进行缩放");//创建提示窗口
+                    createBottomTipWindow(Main.SettingState.systemLanguage ? "File Loading, Please Waiting To Scaling" : "文件正在加载，请等待加载完成进行缩放");//创建提示窗口
                     return;//返回
                 }
                 handleZoom(e);//进行缩放处理
@@ -620,8 +604,8 @@ public class FileDisplayMainPanel {//文件展示主面板类
 
         public static void applyZoom() {//应用缩放
             if (loading) {//如果正在加载
-                if (!bottomTipLabel.getText().equals(Main.SettingState.systemLanguage ? "Zoom Too Quick" : "请勿过快缩放图片")) {//如果没有提示过
-                    createBottomTipWindow(Main.SettingState.systemLanguage ? "Zoom Too Quick" : "请勿过快缩放图片");//创建提示窗口
+                if (!bottomTipLabel.getText().equals(Main.SettingState.systemLanguage ? "Zoom Too Quick" : "请勿过快缩放")) {//如果没有提示过
+                    createBottomTipWindow(Main.SettingState.systemLanguage ? "Zoom Too Quick" : "请勿过快缩放");//创建提示窗口
                 }
                 return;//返回
             }
@@ -818,7 +802,7 @@ public class FileDisplayMainPanel {//文件展示主面板类
             currentWorker.cancel(true);//则设置取消正在进行的加载任务：不取消，后面未加载的图片会进入新加载的文件夹中
         }
         loading = true;//图像正在加载
-        slideButton.setEnabled(false);//幻灯片按钮无效
+        editButton.setEnabled(false);//编辑按钮无效
         currentFileList = DirectoryTree.getCurrentFileList();//获取当前文件列表
         mainPanel.removeAll();//清空主面板
         thumbnailItemList.clear();//清空缩略图项目列表
@@ -900,7 +884,6 @@ public class FileDisplayMainPanel {//文件展示主面板类
                         fileManipulationButtonEnableJudgement(selectionThumbnailItemList.size());//文件操作按钮状态更新
                         updateBottomTipInformation();//更新提示信息
                     }
-                    slideButton.setEnabled(true);//幻灯片按钮有效
                     Main.diskManagementSystemFrame.setCursor(Cursor.getDefaultCursor());//设置光标为默认
                     loading = false;//图像结束加载
                 }
@@ -1167,8 +1150,8 @@ public class FileDisplayMainPanel {//文件展示主面板类
         } else if (selectionThumbnailItemList.size() == 1) {//如果只有一个项目被选中
             if (clickedItem == selectionThumbnailItemList.getFirst()) {//如果选中项目是自身
                 if (Main.SettingState.dbclickBehavior) {//如果是双击打开
-                    if (slideButton.isEnabled()) {//如果幻灯片按钮有效
-                        FileDisplayBottomBar.handleSlide();//处理打开
+                    if (editButton.isEnabled()) {//如果幻灯片按钮有效
+                        FileDisplayBottomBar.handleEdit();//处理打开
                     }
                 } else {//否则是双击反选
                     selectionThumbnailItemList.clear();//清空所有选中状态

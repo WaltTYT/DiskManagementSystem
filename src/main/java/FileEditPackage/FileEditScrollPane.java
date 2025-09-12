@@ -210,7 +210,7 @@ public class FileEditScrollPane {//幻灯片滚动栏类
                     throw new RuntimeException(e);//捕获异常
                 }
                 content.add(createItemHoverTipLabel((Main.SettingState.systemLanguage ? "Size: " : "大小: ") + calculateItemHoverTipFileSize(file.length())));//图片大小
-                itemHoverTipWindow = new JWindow(Main.slideFrame);//创建提示信息窗口
+                itemHoverTipWindow = new JWindow(Main.editFrame);//创建提示信息窗口
                 itemHoverTipWindow.setContentPane(content);//放入内容
                 itemHoverTipWindow.pack();//合适
                 int x = mousePos.x;//x坐标
@@ -265,7 +265,7 @@ public class FileEditScrollPane {//幻灯片滚动栏类
                     g2d.drawImage(fileImage, 0, 2, null);//绘制图像
                 }
 
-                if (scrollItemList.indexOf(this) == FileEditScrollPane.pictureIndex && Main.slideFrame.isVisible()) {//如果图片被选中且在幻灯片
+                if (scrollItemList.indexOf(this) == FileEditScrollPane.pictureIndex && Main.editFrame.isVisible()) {//如果图片被选中且在幻灯片
                     g2d.setStroke(new BasicStroke(BORDER_THICKNESS));//设置边框厚度
                     g2d.setColor(PICTURE_SELECTED_BORDER_COLOR);//设置边框颜色
                     g2d.drawRect(BORDER_THICKNESS / 2, BORDER_THICKNESS / 2, getWidth() - BORDER_THICKNESS, getHeight() - BORDER_THICKNESS);//绘制矩形
