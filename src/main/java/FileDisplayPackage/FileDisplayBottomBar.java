@@ -578,8 +578,8 @@ public class FileDisplayBottomBar {//文件展示底部栏
         }).start();//开始计时器
     }
 
-    public static void handleEdit() {//处理幻灯片
-        FileEditPanel.isNotEdit = false;//播放幻灯片
+    public static void handleEdit() {//处理编辑
+        FileEditPanel.isNotEdit = false;//开始编辑
         if (itemHoverTipWindow != null) {//如果提示信息不为空
             itemHoverTipWindow.dispose();//释放提示信息
             itemHoverTipWindow = null;//提示信息置空

@@ -29,7 +29,6 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
     public static JTree directoryTree;//目录树
     public static DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "Device" : "设备");//根结点
     public static DefaultMutableTreeNode computerNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "My Computer" : "我的电脑");//电脑结点
-    public static DefaultMutableTreeNode recycleBinNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "Recycle Bin" : "回收站");//回收站结点
     public static DefaultMutableTreeNode cloudNode = new DefaultMutableTreeNode(Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘");//云盘结点
 
     public static JWindow bottomTipWindow;//底部提示窗口
@@ -84,7 +83,7 @@ public class DirectoryTree {//目录树类：采用懒加载方式，即只有�
                         String currentFolder = selectedFile.getPath();//获取当前文件夹
                         FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
                         FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径文本
-                        FileDisplayMainPanel.updateFileDisplayMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
+                        FileDisplayMainPanel.updateFileDisplayMainPanel(false);//通知更新文件展示面板（采用类名调用的方式，防止创建多个类）
                         directoryManipulationButtonEnableJudgement();//按钮判断
                     }
                 } else if (nodeObject instanceof String && nodeObject.equals(Main.SettingState.systemLanguage ? "My Cloud" : "我的云盘")) {//如果是云盘结点

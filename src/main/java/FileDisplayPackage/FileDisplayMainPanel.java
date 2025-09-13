@@ -14,6 +14,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
@@ -30,8 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static DirectoryPackage.DirectoryTree.bottomTipLabel;
-import static DirectoryPackage.DirectoryTree.createBottomTipWindow;
+import static DirectoryPackage.DirectoryTree.*;
 import static FileDisplayPackage.FileDisplayBottomBar.*;
 import static FileDisplayPackage.FileDisplayTopBar.*;
 import static FileEditPackage.FileEditToolBar.handleFirstPicture;
@@ -1020,7 +1020,7 @@ public class FileDisplayMainPanel {//文件展示主面板类
                     if (DirectoryTree.currentNodeObject != null) {//如果当前结点对象非空
                         if (DirectoryTree.currentNodeObject instanceof File selectedFile) {//如果当前结点对象是文件
                             String currentFolder = selectedFile.getPath();//获取当前文件夹
-                            DirectoryTree.setCurrentFileList(DirectoryTree.detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
+                            DirectoryTree.setCurrentFileList(detectFile(new File(currentFolder).listFiles()));//设置图片文件列表为当前文件夹
                             FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
                             FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径
                             FileDisplayMainPanel.updateFileDisplayMainPanel(false);//通知更新图片预览面板（采用类名调用的方式，防止创建多个类）
@@ -1150,8 +1150,19 @@ public class FileDisplayMainPanel {//文件展示主面板类
         } else if (selectionThumbnailItemList.size() == 1) {//如果只有一个项目被选中
             if (clickedItem == selectionThumbnailItemList.getFirst()) {//如果选中项目是自身
                 if (Main.SettingState.dbclickBehavior) {//如果是双击打开
-                    if (editButton.isEnabled()) {//如果幻灯片按钮有效
-                        FileDisplayBottomBar.handleEdit();//处理打开
+                    File selectedFile = clickedItem.getFile();//获取选中文件
+                    if (selectedFile.isDirectory()) {//如果是目录文件
+                        currentFileList = detectFile(selectedFile.listFiles());//更新文件列表
+                        DirectoryTree.setCurrentFileList(currentFileList);//更新目录树当前文件夹
+                        String currentFolder = selectedFile.getPath();//获取当前文件夹
+                        FileDisplayTopBar.updateFolder(currentFolder);//更新当前文件夹和文件夹列表
+                        FileDisplayTopBar.setDirectoryField(currentFolder);//设置当前文件路径文本
+                        updateFileDisplayMainPanel(false);//通知更新文件展示面板（采用类名调用的方式，防止创建多个类）
+                        directoryManipulationButtonEnableJudgement();//按钮判断
+                    } else {//否则是流式文件
+                        if (editButton.isEnabled()) {//如果幻灯片按钮有效
+                            FileDisplayBottomBar.handleEdit();//处理打开
+                        }
                     }
                 } else {//否则是双击反选
                     selectionThumbnailItemList.clear();//清空所有选中状态

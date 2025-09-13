@@ -34,7 +34,7 @@ import static FileEditPackage.FileEditToolBar.toolBarPanel;
 import static MainPackage.Setting.handleErrorLog;
 import static MainPackage.ThemeColor.*;
 
-public class Main {//主类 TODO 加载FAT 双击节点行为
+public class Main {//主类 TODO 加载FAT 文件属性面板 文件编辑面板 创建文件和目录
     public static DirectoryTree directoryTree;//目录树类
     public static FileDisplayTopBar fileDisplayTopBar;//文件展示顶部栏类
     public static FileDisplayMainPanel fileDisplayMainPanel;//文件展示主面板类
