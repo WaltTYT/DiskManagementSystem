@@ -26,11 +26,11 @@ import static FileDisplayPackage.FileDisplayTopBar.*;
 
 public class FileDisplayPopupMenu {//文件展示右键弹出菜单
     public static JPopupMenu rightMousePopupMenu = new JPopupMenu();//鼠标右键弹出菜单
-    public static JMenuItem cutButton = new JMenuItem(Main.SettingState.systemLanguage ? "Cut (Ctrl + X)" : "剪切（Ctrl + X）");//剪切按钮（有选中图片时有效）
-    public static JMenuItem copyButton = new JMenuItem(Main.SettingState.systemLanguage ? "Copy (Ctrl + C)" : "复制（Ctrl + C）");//复制按钮（有选中图片时有效）
-    public static JMenuItem pasteButton = new JMenuItem(Main.SettingState.systemLanguage ? "Paste (Ctrl + V)" : "粘贴（Ctrl + V）");//粘贴按钮（剪贴板有图片时有效）
-    public static JMenuItem renameButton = new JMenuItem(Main.SettingState.systemLanguage ? "Rename (F2)" : "重命名（F2）");//重命名按钮（选中图片为一时有效）
-    public static JMenuItem removeButton = new JMenuItem(Main.SettingState.systemLanguage ? "Delete (Delete)" : "删除（Delete）");//删除按钮（有选中图片时有效）
+    public static JMenuItem cutButton = new JMenuItem(Main.SettingState.systemLanguage ? "Cut (Ctrl + X)" : "剪切（Ctrl + X）");//剪切按钮（有选中文件时有效）
+    public static JMenuItem copyButton = new JMenuItem(Main.SettingState.systemLanguage ? "Copy (Ctrl + C)" : "复制（Ctrl + C）");//复制按钮（有选中文件时有效）
+    public static JMenuItem pasteButton = new JMenuItem(Main.SettingState.systemLanguage ? "Paste (Ctrl + V)" : "粘贴（Ctrl + V）");//粘贴按钮（剪贴板有文件时有效）
+    public static JMenuItem renameButton = new JMenuItem(Main.SettingState.systemLanguage ? "Rename (F2)" : "重命名（F2）");//重命名按钮（选中文件为一时有效）
+    public static JMenuItem removeButton = new JMenuItem(Main.SettingState.systemLanguage ? "Delete (Delete)" : "删除（Delete）");//删除按钮（有选中文件时有效）
     public static JMenuItem refreshButton = new JMenuItem(Main.SettingState.systemLanguage ? "Refresh (F5)" : "刷新（F5）");//刷新按钮（任何时候有效）
     public static JMenu recycleBinMenu = new JMenu(Main.SettingState.systemLanguage ? "Recycle Bin" : "回收站");//回收站父级菜单项（任何时候有效）
     public static JMenuItem openRecycleBinButton = new JMenuItem(Main.SettingState.systemLanguage ? "Open Recycle Bin (Ctrl + O)" : "打开回收站（Ctrl + O）");//打开回收站按钮（任何时候有效）

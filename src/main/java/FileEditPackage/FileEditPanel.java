@@ -33,7 +33,7 @@ import static FileEditPackage.FileEditScrollPane.*;
 import static FileEditPackage.FileEditToolBar.*;
 import static java.awt.event.InputEvent.CTRL_DOWN_MASK;
 
-public class FileEditPanel {//幻灯片图片面板类
+public class FileEditPanel {//文件编辑面板类
     public static final int SHOW_THRESHOLD = 60;//靠近边缘显示按钮阈值常量
     public static final int MAX_SLIDE_CACHE_REMAIN_AMOUNT = 20;//设置最大幻灯片缓存保留数量用于清理
     public static final int PANEL_DEFAULT_HEIGHT = Main.screenSize.height - 176;//面板默认高度常量

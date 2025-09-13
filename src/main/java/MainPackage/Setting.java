@@ -504,17 +504,17 @@ public class Setting {//设置类
         initBottomTipInformation();//刷新底部提示信息
         updateBottomTipInformation();//刷新底部提示信息
 
-        FileDisplayPopupMenu.cutButton.setText(systemLanguage ? "Cut (Ctrl + X)" : "剪切（Ctrl + X）");//剪切按钮（有选中图片时有效）
-        FileDisplayPopupMenu.copyButton.setText(systemLanguage ? "Copy (Ctrl + C)" : "复制（Ctrl + C）");//复制按钮（有选中图片时有效）
-        FileDisplayPopupMenu.pasteButton.setText(systemLanguage ? "Paste (Ctrl + V)" : "粘贴（Ctrl + V）");//粘贴按钮（剪贴板有图片时有效）
-        FileDisplayPopupMenu.renameButton.setText(systemLanguage ? "Rename (F2)" : "重命名（F2）");//重命名按钮（选中图片为一时有效）
-        FileDisplayPopupMenu.removeButton.setText(systemLanguage ? "Delete (Delete)" : "删除（Delete）");//删除按钮（有选中图片时有效）
+        FileDisplayPopupMenu.cutButton.setText(systemLanguage ? "Cut (Ctrl + X)" : "剪切（Ctrl + X）");//剪切按钮（有选中文件时有效）
+        FileDisplayPopupMenu.copyButton.setText(systemLanguage ? "Copy (Ctrl + C)" : "复制（Ctrl + C）");//复制按钮（有选中文件时有效）
+        FileDisplayPopupMenu.pasteButton.setText(systemLanguage ? "Paste (Ctrl + V)" : "粘贴（Ctrl + V）");//粘贴按钮（剪贴板有文件时有效）
+        FileDisplayPopupMenu.renameButton.setText(systemLanguage ? "Rename (F2)" : "重命名（F2）");//重命名按钮（选中文件为一时有效）
+        FileDisplayPopupMenu.removeButton.setText(systemLanguage ? "Delete (Delete)" : "删除（Delete）");//删除按钮（有选中文件时有效）
         FileDisplayPopupMenu.refreshButton.setText(systemLanguage ? "Refresh (F5)" : "刷新（F5）");//刷新按钮（任何时候有效）
-        FileDisplayPopupMenu.recycleBinMenu.setText(systemLanguage ? "Picture Recycle Bin" : "图片回收站");//图片回收站父级菜单项（任何时候有效）
-        FileDisplayPopupMenu.openRecycleBinButton.setText(systemLanguage ? "Open Image Recycle Bin (Ctrl + O)" : "打开图片回收站（Ctrl + O）");//打开图片回收站按钮（任何时候有效）
-        FileDisplayPopupMenu.emptyRecycleBinButton.setText(systemLanguage ? "Empty Image Recycle Bin (Ctrl + E)" : "清空图片回收站（Ctrl + E）");//清空图片回收站按钮（任何时候有效）
-        FileDisplayPopupMenu.getPathButton.setText(systemLanguage ? "Get Image Path (Ctrl + Shift + C)" : "获取图片路径（Ctrl + Shift + C）");//获取图片路径按钮（有选中图片时有效）
-        FileDisplayPopupMenu.uploadToCloudButton.setText(systemLanguage ? "Upload Picture To Cloud (Ctrl + P)" : "上传图片至云端（Ctrl + P）");//上传图片至云端按钮（用户登录且云端未满且有选中图片）
+        FileDisplayPopupMenu.recycleBinMenu.setText(systemLanguage ? "Recycle Bin" : "回收站");//回收站父级菜单项（任何时候有效）
+        FileDisplayPopupMenu.openRecycleBinButton.setText(systemLanguage ? "Open Recycle Bin (Ctrl + O)" : "打开回收站（Ctrl + O）");//打开回收站按钮（任何时候有效）
+        FileDisplayPopupMenu.emptyRecycleBinButton.setText(systemLanguage ? "Empty Recycle Bin (Ctrl + E)" : "清空回收站（Ctrl + E）");//清空回收站按钮（任何时候有效）
+        FileDisplayPopupMenu.getPathButton.setText(systemLanguage ? "Get File Path (Ctrl + Shift + C)" : "获取文件路径（Ctrl + Shift + C）");//获取路径按钮（有选中图片时有效）
+        FileDisplayPopupMenu.uploadToCloudButton.setText(systemLanguage ? "Upload File To Cloud (Ctrl + P)" : "上传文件至云端（Ctrl + P）");//上传至云端按钮（用户登录且云端未满且有选中图片）
 
         sortComboBox.removeAllItems();//清空项目
         sortComboBox.addItem(sortTypeList[0] == SortType.ANAME ? (SettingState.systemLanguage ? "Sort By Name (Ascending Order)" : "按名称排序（升序）") : (SettingState.systemLanguage ? "Sort By Name (Descending Order)" : "按名称排序（降序）"));//重新添加
@@ -1303,13 +1303,13 @@ public class Setting {//设置类
         contentPanel.add(lightThemeRadioButton);//面板添加浅色主题单选按钮
         contentPanel.add(darkThemeRadioButton);//面板添加深色主题单选按钮
 
-        JLabel dbclickBehaviorLabel = new JLabel(SettingState.systemLanguage ? "Picture Double Click Behavior: " : "图片双击行为：");//双击行为标签
+        JLabel dbclickBehaviorLabel = new JLabel(SettingState.systemLanguage ? "File Double Click Behavior: " : "文件双击行为：");//双击行为标签
         dbclickBehaviorLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
         dbclickBehaviorLabel.setFont(new Font("楷体", PLAIN, 20));//设置字体
         dbclickBehaviorLabel.addMouseListener(new MouseAdapter() {//为双击行为标签添加鼠标事件监听
             @Override
             public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "You Can Choose Whether To Deselect Or Open In Other App When You Double-Click On A Thumbnail Image" : "您可以选择当鼠标双击缩略图图片时是取消选择图片还是在其他应用打开图片"), dbclickBehaviorLabel));//展示提示窗口（鼠标悬浮一秒后展示）
+                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "You Can Choose Whether To Deselect Or Open In Other App When You Double-Click On A File" : "您可以选择当鼠标双击文件时是取消选择文件还是编辑文件"), dbclickBehaviorLabel));//展示提示窗口（鼠标悬浮一秒后展示）
                 hoverTimer.setRepeats(false);//设置计时器不重复
                 hoverTimer.start();//开始计时
                 dbclickBehaviorLabel.setForeground(Color.RED);//悬浮颜色
@@ -1327,9 +1327,9 @@ public class Setting {//设置类
                 dbclickBehaviorLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
             }
         });
-        contentPanel.add(dbclickBehaviorLabel);//图片双击行为
-        JRadioButton deselectBehaviorRadioButton = new JRadioButton(SettingState.systemLanguage ? "Deselect Picture" : "取消选择");//取消选择单选按钮
-        JRadioButton openBehaviorRadioButton = new JRadioButton(SettingState.systemLanguage ? "Play Picture Slide" : "播放图片");//打开图片单选按钮
+        contentPanel.add(dbclickBehaviorLabel);//文件双击行为
+        JRadioButton deselectBehaviorRadioButton = new JRadioButton(SettingState.systemLanguage ? "Deselect File" : "取消选择");//取消选择单选按钮
+        JRadioButton openBehaviorRadioButton = new JRadioButton(SettingState.systemLanguage ? "Edit File" : "编辑文件");//打开图片单选按钮
         deselectBehaviorRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
         deselectBehaviorRadioButton.setBackground(SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
         deselectBehaviorRadioButton.setFont(new Font("楷体", PLAIN, 20));//设置字体
@@ -1579,10 +1579,10 @@ public class Setting {//设置类
         contentPanel.add(openDeleteRadioButton);//面板添加开启提示单选按钮
         contentPanel.add(closeDeleteRadioButton);//面板添加关闭提示单选按钮
 
-        JLabel pictureSuffixLabel = new JLabel(SettingState.systemLanguage ? "Picture Suffix State: " : "图片后缀状态：");//图片后缀标签
+        JLabel pictureSuffixLabel = new JLabel(SettingState.systemLanguage ? "File Suffix State: " : "文件后缀状态：");//文件后缀标签
         pictureSuffixLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
         pictureSuffixLabel.setFont(new Font("楷体", PLAIN, 20));//设置字体
-        pictureSuffixLabel.addMouseListener(new MouseAdapter() {//为图片后缀标签添加鼠标事件监听
+        pictureSuffixLabel.addMouseListener(new MouseAdapter() {//为文件后缀标签添加鼠标事件监听
             @Override
             public void mouseEntered(MouseEvent e) {//如果鼠标进入
                 hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "You Can Choose To Turn Thumbnail Suffix On Or Off" : "您可以选择开启或关闭缩略图的后缀"), pictureSuffixLabel));//展示提示窗口（鼠标悬浮一秒后展示）
@@ -1603,9 +1603,9 @@ public class Setting {//设置类
                 pictureSuffixLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
             }
         });
-        contentPanel.add(pictureSuffixLabel);//图片后缀状态
-        JRadioButton openPictureSuffixRadioButton = new JRadioButton(SettingState.systemLanguage ? "Open" : "开启后缀");//开启图片后缀单选按钮
-        JRadioButton closePictureSuffixRadioButton = new JRadioButton(SettingState.systemLanguage ? "Close" : "关闭后缀");//关闭图片后缀单选按钮
+        contentPanel.add(pictureSuffixLabel);//文件后缀状态
+        JRadioButton openPictureSuffixRadioButton = new JRadioButton(SettingState.systemLanguage ? "Open" : "开启后缀");//开启文件后缀单选按钮
+        JRadioButton closePictureSuffixRadioButton = new JRadioButton(SettingState.systemLanguage ? "Close" : "关闭后缀");//关闭文件后缀单选按钮
         openPictureSuffixRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色
         openPictureSuffixRadioButton.setBackground(SettingState.themeColor ? DARK_DIALOG_MAIN_COLOR : LIGHT_DIALOG_MAIN_COLOR);//设置背景颜色
         openPictureSuffixRadioButton.setFont(new Font("楷体", PLAIN, 20));//设置字体
@@ -1617,17 +1617,17 @@ public class Setting {//设置类
         } else {
             openPictureSuffixRadioButton.setSelected(true);
         }
-        ButtonGroup pictureSuffixButtonGroup = new ButtonGroup();//图片后缀提示组
-        pictureSuffixButtonGroup.add(openPictureSuffixRadioButton);//组添加开启图片后缀单选按钮
-        pictureSuffixButtonGroup.add(closePictureSuffixRadioButton);//组添加关闭图片后缀单选按钮
-        openPictureSuffixRadioButton.addActionListener(_ -> {//为开启图片后缀单选按钮添加事件监听
+        ButtonGroup pictureSuffixButtonGroup = new ButtonGroup();//文件后缀提示组
+        pictureSuffixButtonGroup.add(openPictureSuffixRadioButton);//组添加开启文件后缀单选按钮
+        pictureSuffixButtonGroup.add(closePictureSuffixRadioButton);//组添加关闭文件后缀单选按钮
+        openPictureSuffixRadioButton.addActionListener(_ -> {//为开启文件后缀单选按钮添加事件监听
             SettingState.pictureSuffix = false;//更新
             updateFileDisplayMainPanel(false);//更新
         });
-        openPictureSuffixRadioButton.addMouseListener(new MouseAdapter() {//为开启图片后缀单选按钮添加鼠标事件监听
+        openPictureSuffixRadioButton.addMouseListener(new MouseAdapter() {//为开启文件后缀单选按钮添加鼠标事件监听
             @Override
             public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Turn On Picture Suffix Tip" : "开启图片后缀提示"), openPictureSuffixRadioButton));//展示提示窗口（鼠标悬浮一秒后展示）
+                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Turn On Picture Suffix Tip" : "开启文件后缀提示"), openPictureSuffixRadioButton));//展示提示窗口（鼠标悬浮一秒后展示）
                 hoverTimer.setRepeats(false);//设置计时器不重复
                 hoverTimer.start();//开始计时
                 openPictureSuffixRadioButton.setForeground(Color.RED);//悬浮颜色
@@ -1645,14 +1645,14 @@ public class Setting {//设置类
                 openPictureSuffixRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
             }
         });
-        closePictureSuffixRadioButton.addActionListener(_ -> {//为关闭图片后缀单选按钮添加事件监听
+        closePictureSuffixRadioButton.addActionListener(_ -> {//为关闭文件后缀单选按钮添加事件监听
             SettingState.pictureSuffix = true;//更新
             updateFileDisplayMainPanel(false);//更新
         });
-        closePictureSuffixRadioButton.addMouseListener(new MouseAdapter() {//为关闭图片后缀单选按钮添加鼠标事件监听
+        closePictureSuffixRadioButton.addMouseListener(new MouseAdapter() {//为关闭文件后缀单选按钮添加鼠标事件监听
             @Override
             public void mouseEntered(MouseEvent e) {//如果鼠标进入
-                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Turn Off Picture Suffix Tip" : "关闭图片后缀提示"), closePictureSuffixRadioButton));//展示提示窗口（鼠标悬浮一秒后展示）
+                hoverTimer = new Timer(1000, _ -> showButtonHoverTipWindow((SettingState.systemLanguage ? "Turn Off Picture Suffix Tip" : "关闭文件后缀提示"), closePictureSuffixRadioButton));//展示提示窗口（鼠标悬浮一秒后展示）
                 hoverTimer.setRepeats(false);//设置计时器不重复
                 hoverTimer.start();//开始计时
                 closePictureSuffixRadioButton.setForeground(Color.RED);//悬浮颜色
@@ -1670,8 +1670,8 @@ public class Setting {//设置类
                 closePictureSuffixRadioButton.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//恢复颜色
             }
         });
-        contentPanel.add(openPictureSuffixRadioButton);//面板添加开启图片后缀单选按钮
-        contentPanel.add(closePictureSuffixRadioButton);//面板添加关闭图片后缀单选按钮
+        contentPanel.add(openPictureSuffixRadioButton);//面板添加开启文件后缀单选按钮
+        contentPanel.add(closePictureSuffixRadioButton);//面板添加关闭文件后缀单选按钮
 
         JLabel renameStrategyLabel = new JLabel(SettingState.systemLanguage ? "Repetitive Rename Strategy: " : "重复命名策略：");//命名策略标签
         renameStrategyLabel.setForeground(SettingState.themeColor ? DARK_DIALOG_FONT_COLOR : LIGHT_DIALOG_FONT_COLOR);//设置字体颜色

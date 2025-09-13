@@ -187,9 +187,7 @@ public class FileDisplayTopBar {//文件展示顶部栏
             FileDisplayPopupMenu.removeButton.setEnabled(true);
             FileDisplayPopupMenu.getPathButton.setEnabled(true);
             FileDisplayPopupMenu.uploadToCloudButton.setEnabled(!Main.SettingState.userAccount.isEmpty());//还要根据用户是否登录设置是否可按下
-            if (size == 1 && !selectionThumbnailItemList.getFirst().getFile().isDirectory()) {//如果选中为一个且非目录 TODO
-                editButton.setEnabled(true);
-            }
+            editButton.setEnabled(size == 1 && !selectionThumbnailItemList.getFirst().getFile().isDirectory());//如果选中为一个且非目录
         } else {//否则
             cutButton.setEnabled(false);//设置不可选
             copyButton.setEnabled(false);

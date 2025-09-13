@@ -63,7 +63,7 @@ public class FileDisplayMainPanel {//文件展示主面板类
     public static final List<ThumbnailItem> selectionThumbnailItemList = new ArrayList<>();//选中缩略图项目列表
     private static final Set<String> sortRecallSelectedFilePaths = new HashSet<>();//保存选中文件路径，以便在更改排序方式后进行恢复
 
-    public static int thumbnailItemWidth = 300;//缩略图宽度
+    public static int thumbnailItemWidth = 200;//缩略图宽度
     private static int totalFiles;//总共应处理文件数目
     private static int processedFiles;//已处理文件数目
     public static boolean loading = false;//文件是否在加载
@@ -1347,7 +1347,7 @@ public class FileDisplayMainPanel {//文件展示主面板类
             if (file.isDirectory()) {//如果是目录
                 double ratio = (double) newWidth / directoryIcon.getWidth();//计算图像缩放比例
                 int newHeight = (int) (directoryIcon.getHeight() * ratio);//计算图像新高度
-                BufferedImage thumbnail = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);//创建缩放图像
+                BufferedImage thumbnail = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);//创建缩放图像
                 Graphics2D g2d = thumbnail.createGraphics();//创建
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿
                 g2d.drawImage(directoryIcon, 0, 0, newWidth, newHeight, null);//绘制图像
@@ -1359,7 +1359,7 @@ public class FileDisplayMainPanel {//文件展示主面板类
             } else {//否则是流式文件
                 double ratio = (double) newWidth / textIcon.getWidth();//计算图像缩放比例
                 int newHeight = (int) (textIcon.getHeight() * ratio);//计算图像新高度
-                BufferedImage thumbnail = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);//创建缩放图像
+                BufferedImage thumbnail = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);//创建缩放图像
                 Graphics2D g2d = thumbnail.createGraphics();//创建
                 g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);//抗锯齿
                 g2d.drawImage(textIcon, 0, 0, newWidth, newHeight, null);//绘制图像
