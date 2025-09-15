@@ -44,9 +44,6 @@ public class Main {//主类 TODO 加载FAT 文件属性面板 文件编辑面板
     public static FileEditScrollPane fileEditScrollPane;//幻灯片滚动栏类
     public static FileEditToolBar fileEditToolBar;//幻灯片工具栏类
 
-
-
-
     public static JScrollPane directoryTreeScrollPane;//目录树滚动条
     public static JPanel fileDisplayTopBarPanel;//文件展示顶部栏面板
     public static JScrollPane fileDisplayMainPanelScrollPane;//文件展示主面板滚动条
