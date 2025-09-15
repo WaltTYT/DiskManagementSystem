@@ -53,6 +53,9 @@ public class Main {//主类 TODO 加载FAT 文件属性面板 文件编辑面板
     public static JFrame diskManagementSystemFrame;//磁盘管理系统窗口
     public static JFrame editFrame;//幻灯片窗口
 
+
+
+
     public static final JPanel bottomTipInformationPanel = new JPanel();//底部提示信息面板
     public static final JTextArea bottomTipInformation = new JTextArea();//底部提示信息文本域
     public static final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();//当前电脑分辨率
